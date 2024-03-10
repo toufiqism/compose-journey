@@ -1,5 +1,6 @@
 package com.toufiq.mycomposeapplication.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import com.toufiq.mycomposeapplication.data.UserDataUiEvents
 import com.toufiq.mycomposeapplication.ui.UserInputViewModel
 import com.toufiq.mycomposeapplication.ui.components.AnimalCard
 import com.toufiq.mycomposeapplication.ui.components.AppBarView
+import com.toufiq.mycomposeapplication.ui.components.ButtonComponent
 import com.toufiq.mycomposeapplication.ui.components.TextComponent
 import com.toufiq.mycomposeapplication.ui.components.TextFieldComponent
 
@@ -72,6 +74,15 @@ fun UserInputScreen(userInputViewModel: UserInputViewModel) {
                     onAnimalSelected = {
                         userInputViewModel.onEvent(UserDataUiEvents.AnimalSelected(it))
                     })
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            if (userInputViewModel.isValid()) {
+                ButtonComponent {
+                    Log.d(
+                        "TAG",
+                        "UserInputScreen: ============> ${userInputViewModel.uIState.value.animalSelected} and ${userInputViewModel.uIState.value.nameEntered}"
+                    )
+                }
             }
 
         }

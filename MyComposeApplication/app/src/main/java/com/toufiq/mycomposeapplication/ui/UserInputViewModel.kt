@@ -27,6 +27,9 @@ class UserInputViewModel : ViewModel() {
         }
 
     }
+    fun isValid():Boolean{
+        return uIState.value.animalSelected.isNotEmpty() && uIState.value.nameEntered.isNotEmpty()
+    }
 }
 
 

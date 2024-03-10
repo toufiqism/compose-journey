@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -89,7 +90,7 @@ fun TextFieldComponent(onTextChange: (name: String) -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         value = currentValue,
         onValueChange = {
-            currentValue=it
+            currentValue = it
             onTextChange(it)
         },
         placeholder = {
@@ -124,17 +125,17 @@ fun AnimalCard(image: Int, selected: Boolean, onAnimalSelected: (animalName: Str
                     color = if (selected) Color.Green else Color.Transparent,
                     shape = RoundedCornerShape(8.dp)
                 )
+                .clickable {
+                    val animalName = if (image == R.drawable.ic_dog) "dog" else "cat"
+                    onAnimalSelected(animalName)
+                }
 
         ) {
             Image(
                 modifier = Modifier
                     .padding(16.dp)
                     .wrapContentHeight()
-                    .wrapContentWidth()
-                    .clickable {
-                        val animalName = if (image == R.drawable.ic_dog) "dog" else "cat"
-                        onAnimalSelected(animalName)
-                    },
+                    .wrapContentWidth(),
                 painter = painterResource(id = image),
                 contentDescription = "Animal Image",
             )
@@ -147,4 +148,25 @@ fun AnimalCard(image: Int, selected: Boolean, onAnimalSelected: (animalName: Str
 @Composable
 fun AnimalCardPreview() {
     AnimalCard(image = R.drawable.ic_dog, true, {})
+}
+
+
+@Composable
+fun ButtonComponent(onClick: () -> Unit) {
+    Button(
+        onClick = { onClick() }, modifier = Modifier.fillMaxWidth()
+    ) {
+        TextComponent(
+            textValue = "Click Here!",
+            size = 18.sp,
+            colorValue = Color.LightGray
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun ButtonComponentPreview() {
+    ButtonComponent({})
 }
