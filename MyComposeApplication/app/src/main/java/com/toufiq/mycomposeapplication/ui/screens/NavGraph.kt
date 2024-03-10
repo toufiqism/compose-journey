@@ -11,7 +11,7 @@ import com.toufiq.mycomposeapplication.ui.UserInputViewModel
 fun FunFactsNavGraph(userInputViewModel: UserInputViewModel = viewModel()) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Routes.WELCOME_SCREEN) {
+    NavHost(navController = navController, startDestination = Routes.USER_INPUT_SCREEN) {
         composable(Routes.USER_INPUT_SCREEN) {
             UserInputScreen(userInputViewModel)
         }

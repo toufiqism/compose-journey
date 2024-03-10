@@ -2,6 +2,7 @@ package com.toufiq.mycomposeapplication.ui.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,8 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.toufiq.mycomposeapplication.R
 import com.toufiq.mycomposeapplication.data.UserDataUiEvents
 import com.toufiq.mycomposeapplication.ui.UserInputViewModel
+import com.toufiq.mycomposeapplication.ui.components.AnimalCard
 import com.toufiq.mycomposeapplication.ui.components.AppBarView
 import com.toufiq.mycomposeapplication.ui.components.TextComponent
 import com.toufiq.mycomposeapplication.ui.components.TextFieldComponent
@@ -54,6 +57,13 @@ fun UserInputScreen(userInputViewModel: UserInputViewModel) {
                 textValue = "What Do you Like ?",
                 size = 18.sp
             )
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                AnimalCard(image = R.drawable.ic_cat)
+                AnimalCard(image = R.drawable.ic_dog)
+            }
+
         }
     }
 }
