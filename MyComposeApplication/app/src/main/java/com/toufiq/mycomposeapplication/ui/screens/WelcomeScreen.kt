@@ -15,14 +15,14 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun WelcomeScreen(navController: NavController) {
+fun WelcomeScreen() {
     Surface(modifier = Modifier.fillMaxSize()) {
         Text(
             text = Routes.WELCOME_SCREEN, modifier = Modifier
                 .fillMaxWidth()
                 .height(80.dp)
                 .clickable {
-                    navController.navigate(Routes.USER_INPUT_SCREEN)
+
                 }
         )
     }
@@ -31,5 +31,5 @@ fun WelcomeScreen(navController: NavController) {
 @Preview
 @Composable
 fun WelcomeScreenPreview() {
-    WelcomeScreen(rememberNavController())
+    WelcomeScreen()
 }
