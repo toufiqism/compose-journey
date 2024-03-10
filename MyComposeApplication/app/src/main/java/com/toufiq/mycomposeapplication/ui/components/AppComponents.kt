@@ -1,13 +1,18 @@
 package com.toufiq.mycomposeapplication.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
@@ -18,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -74,7 +80,7 @@ fun TextComponentPreview() {
 
 @Composable
 fun TextFieldComponent(onTextChange: (name: String) -> Unit) {
-    val currentValue by remember {
+    var currentValue by remember {
         mutableStateOf("")
     }
     val localFocusManager = LocalFocusManager.current
@@ -83,6 +89,7 @@ fun TextFieldComponent(onTextChange: (name: String) -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         value = currentValue,
         onValueChange = {
+            currentValue=it
             onTextChange(it)
         },
         placeholder = {
@@ -102,21 +109,36 @@ fun TextFieldComponentPreview() {
 
 
 @Composable
-fun AnimalCard(image:Int) {
+fun AnimalCard(image: Int, selected: Boolean, onAnimalSelected: (animalName: String) -> Unit) {
     Card(
         modifier = Modifier
             .padding(24.dp)
             .size(130.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Image(
+        Box(
             modifier = Modifier
-                .padding(16.dp)
-                .wrapContentHeight()
-                .wrapContentWidth(),
-            painter = painterResource(id = image),
-            contentDescription = "Animal Image"
-        )
+                .fillMaxSize()
+                .border(
+                    width = 1.dp,
+                    color = if (selected) Color.Green else Color.Transparent,
+                    shape = RoundedCornerShape(8.dp)
+                )
+
+        ) {
+            Image(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .wrapContentHeight()
+                    .wrapContentWidth()
+                    .clickable {
+                        val animalName = if (image == R.drawable.ic_dog) "dog" else "cat"
+                        onAnimalSelected(animalName)
+                    },
+                painter = painterResource(id = image),
+                contentDescription = "Animal Image",
+            )
+        }
     }
 }
 
@@ -124,5 +146,5 @@ fun AnimalCard(image:Int) {
 @Preview(showBackground = true)
 @Composable
 fun AnimalCardPreview() {
-    AnimalCard(image = R.drawable.ic_dog)
+    AnimalCard(image = R.drawable.ic_dog, true, {})
 }

@@ -8,7 +8,7 @@ import com.toufiq.mycomposeapplication.data.UserInputScreenState
 
 class UserInputViewModel : ViewModel() {
 
-    private var uIState = mutableStateOf(UserInputScreenState())
+     var uIState = mutableStateOf(UserInputScreenState())
 
 
     fun onEvent(event: UserDataUiEvents) {
