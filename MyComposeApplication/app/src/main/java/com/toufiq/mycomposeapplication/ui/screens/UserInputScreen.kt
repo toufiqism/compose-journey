@@ -29,7 +29,10 @@ import com.toufiq.mycomposeapplication.ui.components.TextComponent
 import com.toufiq.mycomposeapplication.ui.components.TextFieldComponent
 
 @Composable
-fun UserInputScreen(userInputViewModel: UserInputViewModel) {
+fun UserInputScreen(
+    userInputViewModel: UserInputViewModel,
+    onNavigate: (values: Pair<String, String>) -> Unit
+) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -77,12 +80,14 @@ fun UserInputScreen(userInputViewModel: UserInputViewModel) {
             }
             Spacer(modifier = Modifier.weight(1f))
             if (userInputViewModel.isValid()) {
-                ButtonComponent {
-                    Log.d(
-                        "TAG",
-                        "UserInputScreen: ============> ${userInputViewModel.uIState.value.animalSelected} and ${userInputViewModel.uIState.value.nameEntered}"
+                ButtonComponent(onClick = {
+                    onNavigate(
+                        Pair(
+                            userInputViewModel.uIState.value.animalSelected,
+                            userInputViewModel.uIState.value.nameEntered
+                        )
                     )
-                }
+                })
             }
 
         }
@@ -92,5 +97,5 @@ fun UserInputScreen(userInputViewModel: UserInputViewModel) {
 @Preview
 @Composable
 fun UserInputScreenPreview() {
-    UserInputScreen(UserInputViewModel())
+    UserInputScreen(UserInputViewModel(), { })
 }
