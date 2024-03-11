@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,7 +28,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -38,6 +41,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.toufiq.mycomposeapplication.R
+import com.toufiq.mycomposeapplication.ui.theme.Utils
 
 @Composable
 fun AppBarView(text: String) {
@@ -54,7 +58,7 @@ fun AppBarView(text: String) {
         Image(
             painter = painterResource(id = R.drawable.ic_dice),
             contentDescription = "dice logo",
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(60.dp)
         )
     }
 }
@@ -117,6 +121,7 @@ fun AnimalCard(image: Int, selected: Boolean, onAnimalSelected: (animalName: Str
             .size(130.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
+        val localFocusManager = LocalFocusManager.current
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -128,6 +133,7 @@ fun AnimalCard(image: Int, selected: Boolean, onAnimalSelected: (animalName: Str
                 .clickable {
                     val animalName = if (image == R.drawable.ic_dog) "dog" else "cat"
                     onAnimalSelected(animalName)
+                    localFocusManager.clearFocus()
                 }
 
         ) {
@@ -169,4 +175,47 @@ fun ButtonComponent(onClick: () -> Unit) {
 @Composable
 fun ButtonComponentPreview() {
     ButtonComponent({})
+}
+
+
+@Composable
+fun TextWithShadow(text: String) {
+    val shadowOffset = Offset(x = 1f, y = 3f)
+
+    Text(
+        text = text,
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Light,
+        style = TextStyle(shadow = Shadow(color = Utils.generateRandomColors(), shadowOffset, 2f))
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TextWithShadowPreview() {
+    TextWithShadow("Hello")
+}
+
+
+@Composable
+fun FactComposable(value: String) {
+    Card(
+        modifier = Modifier
+            .padding(32.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Column(Modifier.padding(8.dp)) {
+            Image(painter = painterResource(id = R.drawable.ic_open), contentDescription = "open",Modifier.size(32.dp).padding(6.dp))
+            TextWithShadow(text = value)
+            Image(painter = painterResource(id = R.drawable.ic_close), contentDescription = "close",Modifier.size(32.dp).padding(6.dp))
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FactComposablePreview() {
+    FactComposable(value = "Hello")
 }

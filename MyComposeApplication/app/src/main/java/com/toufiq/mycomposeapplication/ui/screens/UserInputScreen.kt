@@ -83,8 +83,8 @@ fun UserInputScreen(
                 ButtonComponent(onClick = {
                     onNavigate(
                         Pair(
-                            userInputViewModel.uIState.value.animalSelected,
-                            userInputViewModel.uIState.value.nameEntered
+                            userInputViewModel.uIState.value.nameEntered,
+                            userInputViewModel.uIState.value.animalSelected
                         )
                     )
                 })
