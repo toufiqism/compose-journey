@@ -37,7 +37,7 @@ fun TweetListItem(tweet: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp), border = BorderStroke(1.dp, generateRandomColors())
+            .padding(vertical = 6.dp, horizontal = 12.dp), border = BorderStroke(1.dp, generateRandomColors())
     ) {
         Text(
             text = tweet,
