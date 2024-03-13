@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.toufiq.composewithmvvm.models.TweetListItem
 import com.toufiq.composewithmvvm.viewmodels.TweetsViewModel
+import kotlin.random.Random
 
 @Composable
 fun DetailsScreen() {
@@ -36,7 +37,7 @@ fun TweetListItem(tweet: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp), border = BorderStroke(1.dp, Color(0xFFCCCCCC))
+            .padding(12.dp), border = BorderStroke(1.dp, generateRandomColors())
     ) {
         Text(
             text = tweet,
@@ -44,4 +45,13 @@ fun TweetListItem(tweet: String) {
             style = MaterialTheme.typography.bodyMedium
         )
     }
+}
+
+fun generateRandomColors(): Color {
+    return Color(
+        red = Random.nextFloat(),
+        green = Random.nextFloat(),
+        blue = Random.nextFloat(),
+        alpha = 1f
+    )
 }
