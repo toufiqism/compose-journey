@@ -3,18 +3,26 @@ package com.toufiq.pokedexapp.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -23,30 +31,40 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.*
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.google.accompanist.coil.CoilImage
 import com.toufiq.pokedexapp.R
 import com.toufiq.pokedexapp.data.models.PokedexListEntry
+import com.toufiq.pokedexapp.data.remote.responses.PokemonList
 import com.toufiq.pokedexapp.ui.PokemonListViewModel
 import com.toufiq.pokedexapp.ui.Routes
 import com.toufiq.pokedexapp.ui.theme.RobotoCondensed
@@ -72,12 +90,72 @@ fun PokemonListScreen(navController: NavController) {
             ) {
 
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            val viewModel: PokemonListViewModel = hiltViewModel()
+            val categories = viewModel.pokemonListV2.collectAsState()
+            val items: List<PokedexListEntry> = if (categories.value != null) {
+                viewModel.convertResultsToPokedexEntries(categories.value!!.results)
+            } else {
+                emptyList()
+            }
+
+            if (categories.value == null) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.padding(16.dp),
+                        color = colorResource(id = R.color.purple_200),
+                        strokeWidth = Dp(value = 4F)
+                    )
+                }
+
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(8.dp),
+                    verticalArrangement = Arrangement.SpaceAround
+                ) {
+                    items(items) {
+                        PokedexEntry(entry = it, navController = navController)
+                    }
+                }
+            }
 
         }
 
     }
 }
 
+@Composable
+fun CategoryItem(category: String) {
+    Box(
+        modifier = Modifier
+            .padding(4.dp)
+            .size(180.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .paint(
+                painter = painterResource(id = R.drawable.ic_international_pok_mon_logo),
+                contentScale = ContentScale.Crop
+            )
+            .border(
+                1.dp,
+                Color(0xFFEEEEEE)
+            ), contentAlignment = Alignment.TopCenter
+    ) {
+        Text(
+            text = category,
+            fontSize = 24.sp,
+            color = Color.Black,
+            modifier = Modifier.padding(0.dp, 20.dp),
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
 
 @Composable
 @Preview(showBackground = true)
@@ -138,7 +216,7 @@ fun PokedexEntry(
     viewModel: PokemonListViewModel = hiltViewModel()
 ) {
     val defaultDominantColor = MaterialTheme.colorScheme.surface
-    var dominantColor by remember {
+    val dominantColor by remember {
         mutableStateOf(defaultDominantColor)
     }
     Box(
@@ -147,6 +225,7 @@ fun PokedexEntry(
             .shadow(5.dp, RoundedCornerShape(10.dp))
             .clip(RoundedCornerShape(10.dp))
             .aspectRatio(1f)
+            .padding(16.dp)
             .background(
                 Brush.verticalGradient(
                     listOf(
@@ -160,26 +239,22 @@ fun PokedexEntry(
             }
     ) {
         Column {
-            CoilImage(
-                request = ImageRequest.Builder(LocalContext.current)
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
                     .data(entry.imageUrl)
-                    .target {
-                        viewModel.calcDominantColor(it) { color ->
-                            dominantColor = color
-                        }
-                    }
                     .build(),
+//                loading = {
+//                    CircularProgressIndicator()
+//                },
+                placeholder = painterResource(R.drawable.ic_international_pok_mon_logo),
+                contentScale = ContentScale.Fit,
                 contentDescription = entry.pokemonName,
-                fadeIn = true,
                 modifier = Modifier
                     .size(120.dp)
                     .align(Alignment.CenterHorizontally)
-            ) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.scale(0.5f)
-                )
-            }
+                    .clip(CircleShape)
+
+            )
             Text(
                 text = entry.pokemonName,
                 fontFamily = RobotoCondensed,
@@ -191,30 +266,3 @@ fun PokedexEntry(
     }
 }
 
-@Composable
-fun PokedexRow(
-    rowIndex: Int,
-    entries: List<PokedexListEntry>,
-    navController: NavController
-) {
-    Column {
-        Row {
-            PokedexEntry(
-                entry = entries[rowIndex * 2],
-                navController = navController,
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            if (entries.size >= rowIndex * 2 + 2) {
-                PokedexEntry(
-                    entry = entries[rowIndex * 2],
-                    navController = navController,
-                    modifier = Modifier.weight(1f)
-                )
-            } else {
-                Spacer(modifier = Modifier.weight(1f))
-            }
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-    }
-}
