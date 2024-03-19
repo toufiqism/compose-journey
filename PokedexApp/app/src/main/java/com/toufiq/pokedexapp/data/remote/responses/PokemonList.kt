@@ -11,5 +11,5 @@ data class PokemonList(
     @SerializedName("previous")
     var previous: Any?,
     @SerializedName("results")
-    var results: List<Result?>?
+    var results: List<Result>
 )

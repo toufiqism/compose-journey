@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,11 +17,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -31,8 +31,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,11 +60,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.toufiq.pokedexapp.R
 import com.toufiq.pokedexapp.data.models.PokedexListEntry
-import com.toufiq.pokedexapp.data.remote.responses.PokemonList
 import com.toufiq.pokedexapp.ui.PokemonListViewModel
 import com.toufiq.pokedexapp.ui.Routes
 import com.toufiq.pokedexapp.ui.theme.RobotoCondensed
@@ -72,8 +70,29 @@ import com.toufiq.pokedexapp.ui.theme.RobotoCondensed
 
 @Composable
 fun PokemonListScreen(navController: NavController) {
+//    val viewModel: PokemonListViewModel = hiltViewModel()
+
+    val viewModel: PokemonListViewModel = hiltViewModel()
+    val listState = rememberLazyGridState()
+//    val pList = viewModel.pokemonList.value
+
+    val pList by remember { viewModel.pokemonList }
+
+//    val categories = viewModel.pokemonListV2.collectAsState()
+//    val items: List<PokedexListEntry> = if (categories.value != null) {
+//        viewModel.convertResultsToPokedexEntries(categories.value!!.results)
+//    } else {
+//        emptyList()
+//    }
+
+    LaunchedEffect(listState) {
+        if (listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size >= pList.size) {
+            viewModel.loadMorePokemon()
+        }
+    }
 
     Surface(color = Color.Gray, modifier = Modifier.fillMaxSize()) {
+
         Column {
             Spacer(modifier = Modifier.height(20.dp))
             Image(
@@ -91,15 +110,11 @@ fun PokemonListScreen(navController: NavController) {
 
             }
             Spacer(modifier = Modifier.height(16.dp))
-            val viewModel: PokemonListViewModel = hiltViewModel()
-            val categories = viewModel.pokemonListV2.collectAsState()
-            val items: List<PokedexListEntry> = if (categories.value != null) {
-                viewModel.convertResultsToPokedexEntries(categories.value!!.results)
-            } else {
-                emptyList()
-            }
 
-            if (categories.value == null) {
+
+
+
+            if (pList.isEmpty()) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -118,9 +133,10 @@ fun PokemonListScreen(navController: NavController) {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     contentPadding = PaddingValues(8.dp),
-                    verticalArrangement = Arrangement.SpaceAround
+                    verticalArrangement = Arrangement.SpaceAround,
+                    state = listState
                 ) {
-                    items(items) {
+                    items(pList) {
                         PokedexEntry(entry = it, navController = navController)
                     }
                 }
@@ -129,6 +145,7 @@ fun PokemonListScreen(navController: NavController) {
         }
 
     }
+
 }
 
 @Composable

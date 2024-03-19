@@ -92,6 +92,11 @@ dependencies {
 
     // Coil
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    //Paging
+    implementation libs.androidx.paging.runtime.ktx.v311
+    implementation libs.androidx.paging.compose
+
 }
 
 kapt {

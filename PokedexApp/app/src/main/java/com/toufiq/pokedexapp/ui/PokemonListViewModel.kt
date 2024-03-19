@@ -42,14 +42,12 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
     var endReached = mutableStateOf(false)
 
 
-    init {
-//        loadPokemonPaginated()
-        viewModelScope.launch {
-            repository.getPokemonListV2(PAGE_SIZE, curPage * PAGE_SIZE)
+    fun loadMorePokemon() {
+        if (!isLoading.value && !endReached.value) {
+            loadPokemonPaginated()
         }
     }
-
-    fun loadPokemonPaginated() {
+    private fun loadPokemonPaginated() {
         isLoading.value = true
         viewModelScope.launch {
             when (val result: Resource<PokemonList> = repository.getPokemonList(PAGE_SIZE, curPage * PAGE_SIZE)) {
@@ -101,8 +99,15 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
         }
         return pokedexEntries
     }
+//
+//
+//    val pokemonListV2: StateFlow<PokemonList?>
+//        get() = repository.pokemonList
 
-
-    val pokemonListV2: StateFlow<PokemonList?>
-        get() = repository.pokemonList
+    init {
+        loadPokemonPaginated()
+//        viewModelScope.launch {
+//            repository.getPokemonListV2(PAGE_SIZE, curPage * PAGE_SIZE)
+//        }
+    }
 }
