@@ -40,6 +40,9 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
     var loadError = mutableStateOf("")
     var isLoading = mutableStateOf(false)
     var endReached = mutableStateOf(false)
+    var cachedPokemonList = listOf<PokedexListEntry>()
+    var isSearchStarting = true
+    var isSearching = mutableStateOf(false)
 
 
     fun loadMorePokemon() {
@@ -47,10 +50,12 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
             loadPokemonPaginated()
         }
     }
+
     private fun loadPokemonPaginated() {
         isLoading.value = true
         viewModelScope.launch {
-            when (val result: Resource<PokemonList> = repository.getPokemonList(PAGE_SIZE, curPage * PAGE_SIZE)) {
+            when (val result: Resource<PokemonList> =
+                repository.getPokemonList(PAGE_SIZE, curPage * PAGE_SIZE)) {
                 is Resource.Success -> {
                     endReached.value = curPage * PAGE_SIZE >= result.data!!.count!!
                     val pokedexEntries = result.data.results!!.mapIndexed { index, entry ->
@@ -81,7 +86,7 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
                 }
             }
 
-            
+
         }
     }
 

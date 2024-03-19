@@ -29,12 +29,8 @@ object AppModule {
     fun providePokeApi(): PokemonApi {
         return Retrofit.Builder().baseUrl(Constants.baseURL)
             .addConverterFactory(GsonConverterFactory.create()).client(OkHttpClient.Builder().addInterceptor(
-                getInterceptor()
+                HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
             ).build()).build()
             .create(PokemonApi::class.java)
-    }
-
-    fun getInterceptor()=HttpLoggingInterceptor().apply {
-        level=HttpLoggingInterceptor.Level.BODY
     }
 }
