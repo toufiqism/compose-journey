@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -73,10 +74,11 @@ fun PokemonListScreen(navController: NavController) {
 //    val viewModel: PokemonListViewModel = hiltViewModel()
 
     val viewModel: PokemonListViewModel = hiltViewModel()
-    val listState = rememberLazyGridState()
-//    val pList = viewModel.pokemonList.value
-
-    val pList by remember { viewModel.pokemonList }
+//    val listState = rememberLazyGridState()
+    val pList = viewModel.pokemonList.value
+    // Keep track of whether we're at the end of the list
+    val isAtEnd = remember { mutableStateOf(false) }
+//    val pList by remember { viewModel.pokemonList }
 
 //    val categories = viewModel.pokemonListV2.collectAsState()
 //    val items: List<PokedexListEntry> = if (categories.value != null) {
@@ -85,11 +87,11 @@ fun PokemonListScreen(navController: NavController) {
 //        emptyList()
 //    }
 
-    LaunchedEffect(listState) {
-        if (listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size >= pList.size) {
-            viewModel.loadMorePokemon()
-        }
-    }
+//    LaunchedEffect(listState) {
+//        if (listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size >= pList.size) {
+//            viewModel.loadMorePokemon()
+//        }
+//    }
 
     Surface(color = Color.Gray, modifier = Modifier.fillMaxSize()) {
 
@@ -134,16 +136,30 @@ fun PokemonListScreen(navController: NavController) {
                     columns = GridCells.Fixed(2),
                     contentPadding = PaddingValues(8.dp),
                     verticalArrangement = Arrangement.SpaceAround,
-                    state = listState
+//                    state = listState
                 ) {
-                    items(pList) {
-                        PokedexEntry(entry = it, navController = navController)
+                    itemsIndexed(pList) { index, item ->
+                        if (index == pList.size - 6) {
+                            isAtEnd.value = true
+                        }
+                        PokedexEntry(entry = item, navController = navController)
+
+
                     }
                 }
             }
 
         }
 
+    }
+    LaunchedEffect(isAtEnd.value) {
+        if (isAtEnd.value) {
+
+            // Make API call
+            viewModel.loadMorePokemon()
+            // Reset isAtEnd state
+            isAtEnd.value = false
+        }
     }
 
 }
