@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,18 +20,14 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,17 +43,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.toufiq.pokedexapp.R
@@ -84,6 +78,8 @@ fun PokemonListScreen(navController: NavController) {
 //    } else {
 //        emptyList()
 //    }
+
+    val res = viewModel.pager.collectAsLazyPagingItems()
 
     LaunchedEffect(listState) {
         if (listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size >= pList.size) {
@@ -112,35 +108,48 @@ fun PokemonListScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
 
-
-
-            if (pList.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.padding(16.dp),
-                        color = colorResource(id = R.color.purple_200),
-                        strokeWidth = Dp(value = 4F)
-                    )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.SpaceAround,
+                state = listState
+            ) {
+                items(res.itemCount) {
+                   
                 }
+                res.apply {
 
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(8.dp),
-                    verticalArrangement = Arrangement.SpaceAround,
-                    state = listState
-                ) {
-                    items(pList) {
-                        PokedexEntry(entry = it, navController = navController)
-                    }
                 }
             }
+
+
+//            if (pList.isEmpty()) {
+//                Column(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .fillMaxHeight(),
+//                    verticalArrangement = Arrangement.Center,
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                ) {
+//                    CircularProgressIndicator(
+//                        modifier = Modifier.padding(16.dp),
+//                        color = colorResource(id = R.color.purple_200),
+//                        strokeWidth = Dp(value = 4F)
+//                    )
+//                }
+//
+//            } else {
+//                LazyVerticalGrid(
+//                    columns = GridCells.Fixed(2),
+//                    contentPadding = PaddingValues(8.dp),
+//                    verticalArrangement = Arrangement.SpaceAround,
+//                    state = listState
+//                ) {
+//                    items(pList) {
+//                        PokedexEntry(entry = it, navController = navController)
+//                    }
+//                }
+//            }
 
         }
 

@@ -13,10 +13,10 @@ import javax.inject.Inject
 @ActivityScoped
 class PokemonRepository @Inject constructor(private val pokemonApi: PokemonApi) {
 
-//
-//    private val _pokemonList = MutableStateFlow<PokemonList?>(null)
-//    val pokemonList: StateFlow<PokemonList?>
-//        get() = _pokemonList
+
+    private val _pokemonList = MutableStateFlow<PokemonList?>(null)
+    val pokemonList: StateFlow<PokemonList?>
+        get() = _pokemonList
 
     suspend fun getPokemonList(limit: Int, offset: Int): Resource<PokemonList> {
         val response = try {
@@ -27,12 +27,12 @@ class PokemonRepository @Inject constructor(private val pokemonApi: PokemonApi) 
         return Resource.Success(response)
     }
 
-//    suspend fun getPokemonListV2(limit: Int, offset: Int){
-//        val response = pokemonApi.getPokemonListV2(limit, offset)
-//        if (response.isSuccessful && response.body() != null) {
-//            _pokemonList.emit(response.body())
-//        }
-//    }
+    suspend fun getPokemonListV2(limit: Int, offset: Int){
+        val response = pokemonApi.getPokemonListV2(limit, offset)
+        if (response.isSuccessful && response.body() != null) {
+            _pokemonList.emit(response.body())
+        }
+    }
 
     suspend fun getPokemonInfo(pokemonName: String): Resource<Pokemon> {
         val response = try {
