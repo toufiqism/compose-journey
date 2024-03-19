@@ -123,7 +123,7 @@ class PokemonListViewModel @Inject constructor(
             }).flow.cachedIn(viewModelScope)
 
     init {
-        loadPokemonPaginated()
+//        loadPokemonPaginated()
 //        viewModelScope.launch {
 //            repository.getPokemonListV2(PAGE_SIZE, curPage * PAGE_SIZE)
 //        }

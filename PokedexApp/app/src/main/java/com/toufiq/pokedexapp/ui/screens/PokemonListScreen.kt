@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -52,11 +53,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.toufiq.pokedexapp.R
 import com.toufiq.pokedexapp.data.models.PokedexListEntry
+import com.toufiq.pokedexapp.data.remote.responses.Result
 import com.toufiq.pokedexapp.ui.PokemonListViewModel
 import com.toufiq.pokedexapp.ui.Routes
 import com.toufiq.pokedexapp.ui.theme.RobotoCondensed
@@ -81,11 +84,11 @@ fun PokemonListScreen(navController: NavController) {
 
     val res = viewModel.pager.collectAsLazyPagingItems()
 
-    LaunchedEffect(listState) {
-        if (listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size >= pList.size) {
-            viewModel.loadMorePokemon()
-        }
-    }
+//    LaunchedEffect(listState) {
+//        if (listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size >= pList.size) {
+//            viewModel.loadMorePokemon()
+//        }
+//    }
 
     Surface(color = Color.Gray, modifier = Modifier.fillMaxSize()) {
 
@@ -112,13 +115,64 @@ fun PokemonListScreen(navController: NavController) {
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(8.dp),
                 verticalArrangement = Arrangement.SpaceAround,
-                state = listState
             ) {
-                items(res.itemCount) {
-                   
+                items(res.itemSnapshotList) { it ->
+                    PokedexEntry(entry = it!!, navController = navController)
                 }
                 res.apply {
-
+                    when{
+                        loadState.refresh is LoadState.Loading ->{
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(16.dp)
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .padding(12.dp)
+                                            .align(
+                                                Alignment.Center
+                                            )
+                                    )
+                                }
+                            }
+                        }
+                        loadState.append is LoadState.Loading ->{
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(16.dp)
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .padding(12.dp)
+                                            .align(
+                                                Alignment.Center
+                                            )
+                                    )
+                                }
+                            }
+                        }
+                        loadState.prepend is LoadState.Loading ->{
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(16.dp)
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .padding(12.dp)
+                                            .align(
+                                                Alignment.Center
+                                            )
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -236,7 +290,7 @@ fun SearchBar(
 
 @Composable
 fun PokedexEntry(
-    entry: PokedexListEntry,
+    entry: Result,
     navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: PokemonListViewModel = hiltViewModel()
@@ -261,20 +315,20 @@ fun PokedexEntry(
                 )
             )
             .clickable {
-                navController.navigate(Routes.POKEMON_DETAILS_SCREEN + "/${dominantColor.toArgb()}/${entry.pokemonName}")
+                navController.navigate(Routes.POKEMON_DETAILS_SCREEN + "/${dominantColor.toArgb()}/${entry.name}")
             }
     ) {
         Column {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(entry.imageUrl)
+                    .data(entry.url)
                     .build(),
 //                loading = {
 //                    CircularProgressIndicator()
 //                },
                 placeholder = painterResource(R.drawable.ic_international_pok_mon_logo),
                 contentScale = ContentScale.Fit,
-                contentDescription = entry.pokemonName,
+                contentDescription = entry.name,
                 modifier = Modifier
                     .size(120.dp)
                     .align(Alignment.CenterHorizontally)
@@ -282,7 +336,7 @@ fun PokedexEntry(
 
             )
             Text(
-                text = entry.pokemonName,
+                text = entry.name ?: "N/A",
                 fontFamily = RobotoCondensed,
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
