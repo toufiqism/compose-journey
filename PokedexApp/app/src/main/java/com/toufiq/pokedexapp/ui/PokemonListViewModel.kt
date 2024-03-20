@@ -16,6 +16,7 @@ import com.toufiq.pokedexapp.repository.PokemonRepository
 import com.toufiq.pokedexapp.util.Constants.PAGE_SIZE
 import com.toufiq.pokedexapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -48,6 +49,34 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
     fun loadMorePokemon() {
         if (!isLoading.value && !endReached.value) {
             loadPokemonPaginated()
+        }
+    }
+
+    fun searchPokemon(query: String) {
+        val listToSearch = if (isSearchStarting) {
+            pokemonList.value
+        } else {
+            cachedPokemonList
+        }
+        viewModelScope.launch(Dispatchers.Default) {
+            if (query.isEmpty()) {
+                pokemonList.value = cachedPokemonList
+                isSearching.value = false
+                isSearchStarting = true
+                return@launch
+            }
+            val res = listToSearch.filter {
+                it.pokemonName.contains(
+                    query.trim(),
+                    ignoreCase = true
+                ) || it.number.toString() == query.trim()
+            }
+            if (isSearchStarting) {
+                cachedPokemonList = pokemonList.value
+                isSearchStarting = false
+            }
+            pokemonList.value = res
+            isSearching.value = true
         }
     }
 

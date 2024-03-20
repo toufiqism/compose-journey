@@ -71,27 +71,14 @@ import com.toufiq.pokedexapp.ui.theme.RobotoCondensed
 
 @Composable
 fun PokemonListScreen(navController: NavController) {
-//    val viewModel: PokemonListViewModel = hiltViewModel()
 
     val viewModel: PokemonListViewModel = hiltViewModel()
-//    val listState = rememberLazyGridState()
     val pList = viewModel.pokemonList.value
     // Keep track of whether we're at the end of the list
     val isAtEnd = remember { mutableStateOf(false) }
-//    val pList by remember { viewModel.pokemonList }
-
-//    val categories = viewModel.pokemonListV2.collectAsState()
-//    val items: List<PokedexListEntry> = if (categories.value != null) {
-//        viewModel.convertResultsToPokedexEntries(categories.value!!.results)
-//    } else {
-//        emptyList()
-//    }
-
-//    LaunchedEffect(listState) {
-//        if (listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size >= pList.size) {
-//            viewModel.loadMorePokemon()
-//        }
-//    }
+    val isSearching by remember {
+        viewModel.isSearching
+    }
 
     Surface(color = Color.Gray, modifier = Modifier.fillMaxSize()) {
 
@@ -109,13 +96,9 @@ fun PokemonListScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-
+                viewModel.searchPokemon(it)
             }
             Spacer(modifier = Modifier.height(16.dp))
-
-
-
-
             if (pList.isEmpty()) {
                 Column(
                     modifier = Modifier
@@ -136,7 +119,7 @@ fun PokemonListScreen(navController: NavController) {
                     columns = GridCells.Fixed(2),
                     contentPadding = PaddingValues(8.dp),
                     verticalArrangement = Arrangement.SpaceAround,
-//                    state = listState
+
                 ) {
                     itemsIndexed(pList) { index, item ->
                         if (index == pList.size - 6) {
@@ -153,7 +136,7 @@ fun PokemonListScreen(navController: NavController) {
 
     }
     LaunchedEffect(isAtEnd.value) {
-        if (isAtEnd.value) {
+        if (isAtEnd.value && !isSearching) {
 
             // Make API call
             viewModel.loadMorePokemon()
@@ -227,7 +210,7 @@ fun SearchBar(
                 .background(Color.White, CircleShape)
                 .padding(horizontal = 20.dp, vertical = 12.dp)
                 .onFocusChanged {
-                    isHintDisplayed = it.isFocused != true
+                    isHintDisplayed = it.isFocused != true && text.isNotEmpty()
                 }
         )
         if (isHintDisplayed) {
