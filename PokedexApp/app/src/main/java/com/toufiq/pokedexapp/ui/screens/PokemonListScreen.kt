@@ -251,7 +251,7 @@ fun PokedexEntry(
                 )
             )
             .clickable {
-                navController.navigate(Routes.POKEMON_DETAILS_SCREEN + "/${dominantColor.toArgb()}/${entry.pokemonName}")
+                navController.navigate(Routes.POKEMON_DETAILS_SCREEN + "/${entry.pokemonName}")
             }
     ) {
         Column {
