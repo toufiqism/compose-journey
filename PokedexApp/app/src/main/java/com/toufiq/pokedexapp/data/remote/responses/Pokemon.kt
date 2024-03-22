@@ -39,7 +39,7 @@ data class Pokemon(
     @SerializedName("sprites")
     var sprites: Sprites?,
     @SerializedName("stats")
-    var stats: List<Stat>?,
+    var stats: List<Stat>,
     @SerializedName("types")
     var types: List<Type>?,
     @SerializedName("weight")
