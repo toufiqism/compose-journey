@@ -1,4 +1,4 @@
-package com.toufiq.composemovieapp.utils
+package com.toufiq.composemovieapp.movielist.utils
 
 sealed class Resource<T>(
     val data: T? = null,

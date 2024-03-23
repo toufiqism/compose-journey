@@ -9,7 +9,7 @@ data class MovieListDto(
     @SerializedName("page")
     var page: Int?,
     @SerializedName("results")
-    var results: List<Result?>?,
+    var results: List<MovieDto>?,
     @SerializedName("total_pages")
     var totalPages: Int?,
     @SerializedName("total_results")

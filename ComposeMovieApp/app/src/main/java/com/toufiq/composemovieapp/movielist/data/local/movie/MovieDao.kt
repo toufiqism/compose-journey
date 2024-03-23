@@ -3,7 +3,7 @@ package com.toufiq.composemovieapp.movielist.data.local.movie
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.toufiq.composemovieapp.movielist.domain.model.MovieEntity
+import com.toufiq.composemovieapp.movielist.data.local.movie.MovieEntity
 
 
 @Dao
