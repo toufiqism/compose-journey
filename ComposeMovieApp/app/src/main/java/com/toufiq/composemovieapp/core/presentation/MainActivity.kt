@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.toufiq.composemovieapp.core.routes.NavGraph
 import com.toufiq.composemovieapp.movielist.presentation.MovieListViewModel
 import com.toufiq.composemovieapp.ui.theme.ComposeMovieAppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,10 +31,15 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
+                    MainApp()
                 }
             }
         }
+    }
+
+    @Composable
+    private fun MainApp() {
+        NavGraph()
     }
 
     @Composable

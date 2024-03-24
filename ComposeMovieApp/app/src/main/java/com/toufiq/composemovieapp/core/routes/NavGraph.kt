@@ -11,7 +11,7 @@ import com.toufiq.composemovieapp.core.presentation.HomeScreen
 @Composable
 fun NavGraph() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Routes.Details.rout) {
+    NavHost(navController = navController, startDestination = Routes.Home.rout) {
         composable(Routes.Home.rout) {
             HomeScreen(navController)
         }
