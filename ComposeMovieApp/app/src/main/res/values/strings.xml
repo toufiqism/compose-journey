@@ -2,4 +2,8 @@
     <string name="app_name">ComposeMovieApp</string>
     <string name="popular">Popular</string>
     <string name="upcoming">Upcoming</string>
+    <string name="language">"Language: "</string>
+    <string name="release_date">"Release Date: "</string>
+    <string name="votes">" Votes\n"</string>
+    <string name="overview">"Overview: "</string>
 </resources>

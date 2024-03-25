@@ -20,7 +20,7 @@ fun NavGraph() {
             Routes.Details.rout + "/{movieId}",
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })
         ) {
-            DetailsScreen(navBackStackEntry = it)
+            DetailsScreen()
         }
     }
 }
