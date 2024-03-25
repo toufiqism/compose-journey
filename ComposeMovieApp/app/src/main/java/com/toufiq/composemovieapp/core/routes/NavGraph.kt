@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.toufiq.composemovieapp.core.presentation.HomeScreen
+import com.toufiq.composemovieapp.details.presantation.DetailsScreen
 
 @Composable
 fun NavGraph() {
@@ -19,8 +20,7 @@ fun NavGraph() {
             Routes.Details.rout + "/{movieId}",
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })
         ) {
-
-
+            DetailsScreen(navBackStackEntry = it)
         }
     }
 }

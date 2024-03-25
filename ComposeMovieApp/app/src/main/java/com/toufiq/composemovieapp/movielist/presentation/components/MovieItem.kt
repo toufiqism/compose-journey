@@ -109,7 +109,7 @@ fun MovieItem(movie: Movie, navHostController: NavHostController) {
         Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = movie.title,
-            modifier = Modifier.padding(start = 26.dp, end = 8.dp),
+            modifier = Modifier.padding(start = 16.dp, end = 8.dp),
             color = Color.White,
             fontSize = 16.sp,
             maxLines = 1
