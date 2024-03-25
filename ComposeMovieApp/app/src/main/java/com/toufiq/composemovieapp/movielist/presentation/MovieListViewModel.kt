@@ -66,7 +66,7 @@ class MovieListViewModel @Inject constructor(private val movieListRepository: Mo
                             _movieListState.update {
                                 it.copy(
                                     upcomingMovieList = movieListState.value.upcomingMovieList + upcomingList.shuffled(),
-                                    upcomingMovieListPage = movieListState.value.upcomingMovieListPage
+                                    upcomingMovieListPage = movieListState.value.upcomingMovieListPage + 1
 
                                 )
                             }
@@ -100,7 +100,7 @@ class MovieListViewModel @Inject constructor(private val movieListRepository: Mo
                             _movieListState.update {
                                 it.copy(
                                     popularMovieList = movieListState.value.popularMovieList + popularList.shuffled(),
-                                    popularMovieListPage = movieListState.value.popularMovieListPage
+                                    popularMovieListPage = movieListState.value.popularMovieListPage + 1
 
                                 )
                             }

@@ -1,10 +1,7 @@
 package com.toufiq.composemovieapp.core.presentation
 
-import android.media.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -32,20 +29,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.toufiq.composemovieapp.R
 import com.toufiq.composemovieapp.core.routes.Routes
-import com.toufiq.composemovieapp.movielist.domain.model.Movie
 import com.toufiq.composemovieapp.movielist.presentation.MovieListUIEvent
 import com.toufiq.composemovieapp.movielist.presentation.MovieListViewModel
+import com.toufiq.composemovieapp.movielist.presentation.PopularMovieScreen
+import com.toufiq.composemovieapp.movielist.presentation.UpcomingMovieScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavHostController) {
     val movieListViewModel: MovieListViewModel = hiltViewModel()
-    val movieState = movieListViewModel.movieListState.collectAsState().value
+    val movieListState = movieListViewModel.movieListState.collectAsState().value
     val bottomNavController = rememberNavController()
 
     Scaffold(bottomBar = {
@@ -59,7 +58,7 @@ fun HomeScreen(navController: NavController) {
         TopAppBar(
             title = {
                 Text(
-                    text = if (movieState.isCurrentPopularScreen) stringResource(R.string.popular) else stringResource(
+                    text = if (movieListState.isCurrentPopularScreen) stringResource(R.string.popular) else stringResource(
                         R.string.upcoming
                     ), fontSize = 28.sp
                 )
@@ -73,10 +72,12 @@ fun HomeScreen(navController: NavController) {
             .fillMaxSize()){
             NavHost(navController = bottomNavController, startDestination = Routes.PopularMovieList.rout ){
                 composable(Routes.PopularMovieList.rout){
+                    PopularMovieScreen(movieListState = movieListState, navController = navController, onEvent = movieListViewModel::onEvent)
+                        
 
                 }
-                composable(Routes.PopularMovieList.rout){
-
+                composable(Routes.UpcomingMovieList.rout){
+                    UpcomingMovieScreen(movieListState = movieListState, navController = navController, onEvent = movieListViewModel::onEvent)
                 }
             }
         }

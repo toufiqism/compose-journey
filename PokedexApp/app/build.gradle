@@ -6,6 +6,20 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('/Users/sol/Development/compose-journey/PokedexApp/pokedex.jks')
+            storePassword '#G8thanks#'
+            keyAlias 'key0'
+            keyPassword '#G8thanks#'
+        }
+        release {
+            storeFile file('/Users/sol/Development/compose-journey/PokedexApp/pokedex.jks')
+            storePassword '1122334455'
+            keyAlias 'key0'
+            keyPassword '1122334455'
+        }
+    }
     namespace 'com.toufiq.pokedexapp'
     compileSdk 34
 
@@ -26,6 +40,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -71,8 +86,7 @@ dependencies {
 
     //dependency injection
     implementation (libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-
+    kapt libs.dagger.hilt.android.compiler
     //viewmodel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

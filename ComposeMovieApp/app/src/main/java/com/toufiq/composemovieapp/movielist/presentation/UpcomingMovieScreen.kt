@@ -17,13 +17,13 @@ import com.ahmedapps.moviesapp.movieList.util.Category
 import com.toufiq.composemovieapp.movielist.presentation.components.MovieItem
 
 @Composable
-fun PopularMovieScreen(
+fun UpcomingMovieScreen(
     movieListState: MovieListState,
     navController: NavHostController,
     onEvent: (MovieListUIEvent) -> Unit
 ) {
 
-    if (movieListState.popularMovieList.isEmpty()) {
+    if (movieListState.upcomingMovieList.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
@@ -33,13 +33,13 @@ fun PopularMovieScreen(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp)
         ) {
-            items(movieListState.popularMovieList.size) { index ->
+            items(movieListState.upcomingMovieList.size) { index ->
                 MovieItem(
-                    movie = movieListState.popularMovieList[index],
+                    movie = movieListState.upcomingMovieList[index],
                     navHostController = navController
                 )
-                if (index >= movieListState.popularMovieList.size - 1 && !movieListState.isLoading) {
-                    onEvent(MovieListUIEvent.Paginate(category = Category.POPULAR))
+                if (index >= movieListState.upcomingMovieList.size - 1 && !movieListState.isLoading) {
+                    onEvent(MovieListUIEvent.Paginate(category = Category.UPCOMING))
                 }
             }
         }
