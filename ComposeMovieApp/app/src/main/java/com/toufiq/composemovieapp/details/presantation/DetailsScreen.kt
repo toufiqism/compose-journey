@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -146,68 +147,68 @@ fun DetailsScreen() {
                         contentScale = ContentScale.Crop
                     )
                 }
-                detailsState.movie?.let {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            modifier = Modifier.padding(start = 16.dp),
-                            text = it.title,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
+            }
+            detailsState.movie?.let {
+                Column(modifier = Modifier.fillMaxHeight()) {
+                    Text(
+                        modifier = Modifier.padding(start = 16.dp),
+                        text = it.title,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.padding(
+                            start = 16.dp,
+                            bottom = 12.dp,
+                            top = 4.dp
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Row(
-                            modifier = Modifier.padding(
-                                start = 16.dp,
-                                bottom = 12.dp,
-                                top = 4.dp
-                            )
-                        ) {
-                            RatingBar(
-                                starsModifier = Modifier.size(18.dp),
-                                rating = it.vote_average / 2
-                            )
-                            Text(
-                                modifier = Modifier.padding(start = 4.dp),
-                                text = it.vote_average.toString().take(3),
-                                fontSize = 14.sp,
-                                color = Color.LightGray,
-                                maxLines = 1
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            modifier = Modifier.padding(start = 16.dp),
-                            text = stringResource(R.string.language) + it.original_language
+                    ) {
+                        RatingBar(
+                            starsModifier = Modifier.size(18.dp),
+                            rating = it.vote_average / 2
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            modifier = Modifier.padding(start = 16.dp),
-                            text = stringResource(R.string.release_date) + it.release_date
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            modifier = Modifier.padding(start = 16.dp),
-                            text = it.vote_count.toString() + stringResource(R.string.votes)
+                            modifier = Modifier.padding(start = 4.dp),
+                            text = it.vote_average.toString().take(3),
+                            fontSize = 14.sp,
+                            color = Color.LightGray,
+                            maxLines = 1
                         )
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        modifier = Modifier.padding(start = 16.dp),
+                        text = stringResource(R.string.language) + it.original_language
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        modifier = Modifier.padding(start = 16.dp),
+                        text = stringResource(R.string.release_date) + it.release_date
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        modifier = Modifier.padding(start = 16.dp),
+                        text = it.vote_count.toString() + stringResource(R.string.votes)
+                    )
                 }
             }
+        }
+        Text(
+            modifier = Modifier.padding(start = 16.dp),
+            text = stringResource(R.string.overview),
+            fontSize = 22.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        detailsState.movie?.let {
             Text(
                 modifier = Modifier.padding(start = 16.dp),
-                text = stringResource(R.string.overview),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.SemiBold
+                text = it.overview,
+                fontSize = 14.sp
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            detailsState.movie?.let {
-                Text(
-                    modifier = Modifier.padding(start = 16.dp),
-                    text = it.overview,
-                    fontSize = 14.sp)
-            }
-            Spacer(modifier = Modifier.height(32.dp))
-
         }
+        Spacer(modifier = Modifier.height(32.dp))
     }
 
 }

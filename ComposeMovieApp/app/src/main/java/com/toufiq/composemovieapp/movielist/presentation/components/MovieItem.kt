@@ -103,7 +103,7 @@ fun MovieItem(movie: Movie, navHostController: NavHostController) {
                     .padding(6.dp)
                     .clip(RoundedCornerShape(22.dp))
                     .height(220.dp), painter = imageState.painter,
-                contentDescription = movie.title, contentScale = ContentScale.Fit
+                contentDescription = movie.title, contentScale = ContentScale.Crop
             )
         }
         Spacer(modifier = Modifier.height(10.dp))

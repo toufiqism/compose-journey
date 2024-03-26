@@ -6,6 +6,15 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        create("release") {
+            storeFile =
+                file("C:\\Users\\toufi\\OneDrive\\Documents\\GitHub\\compose-journey\\ComposeMovieApp\\movieApp.jks")
+            storePassword = "#G8thanks#"
+            keyAlias = "key0"
+            keyPassword = "#G8thanks#"
+        }
+    }
     namespace = "com.toufiq.composemovieapp"
     compileSdk = 34
 
@@ -29,6 +38,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
