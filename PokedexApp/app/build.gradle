@@ -15,9 +15,9 @@ android {
         }
         release {
             storeFile file('/Users/sol/Development/compose-journey/PokedexApp/pokedex.jks')
-            storePassword '1122334455'
+            storePassword '#G8thanks#'
             keyAlias 'key0'
-            keyPassword '1122334455'
+            keyPassword '#G8thanks#'
         }
     }
     namespace 'com.toufiq.pokedexapp'
