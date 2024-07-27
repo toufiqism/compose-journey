@@ -31,7 +31,55 @@ fun DiceGame(modifier: Modifier = Modifier) {
     }
 
     var diceSum by remember {
-        mutableStateOf(1)
+        mutableStateOf(0)
+    }
+    var status by remember {
+        mutableStateOf("")
+    }
+    var target by remember {
+        mutableStateOf(0)
+    }
+    var btnText by remember {
+        mutableStateOf("Roll")
+    }
+    var isGameOver by remember {
+        mutableStateOf(false)
+    }
+
+    fun reset() {
+        btnText = "Roll"
+        resultLeft = 1
+        resultRight = 1
+        diceSum = 0
+        status = ""
+        isGameOver = false
+        target = 0
+    }
+
+    fun roll() {
+        resultLeft = (1..6).random()
+        resultRight = (1..6).random()
+        diceSum = resultLeft + resultRight
+        if (target > 0) {
+            if (diceSum == target) {
+                status = "You Win"
+                isGameOver = true
+            } else if (diceSum == 7) {
+                status = "You Lose"
+                isGameOver = true
+            }
+        } else if (diceSum == 7 || diceSum == 11) {
+            status = "You Win"
+            isGameOver = true
+        } else if (diceSum == 2 || diceSum == 3 || diceSum == 12) {
+            status = "You Lose"
+            isGameOver = true
+        } else {
+            target = diceSum
+        }
+        if (isGameOver) {
+            btnText = "Reset"
+        }
     }
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Row {
@@ -50,15 +98,24 @@ fun DiceGame(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.size(20.dp))
         Text(text = "Result: $diceSum", fontSize = 18.sp)
         Spacer(modifier = Modifier.size(20.dp))
+
+        Text(text = status, fontSize = 18.sp)
+        if (target > 0) {
+            Text(text = "Your target is: $target", fontSize = 18.sp)
+        }
+        Spacer(modifier = Modifier.size(20.dp))
         Button(onClick = {
-            resultLeft = (1..6).random()
-            resultRight = (1..6).random()
-            diceSum = resultLeft + resultRight
+            if (isGameOver) {
+                reset()
+            } else {
+                roll()
+            }
         }) {
-            Text(text = "Roll the Dice!")
+            Text(text = btnText)
         }
 
     }
+
 }
 
 fun getDiceImageResource(result: Int): Int {
