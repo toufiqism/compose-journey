@@ -3,6 +3,7 @@ package com.toufiq.bmiapp
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -13,6 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,10 +35,18 @@ fun BMIScreen(modifier: Modifier = Modifier) {
         WeightHeightTextField(
             label = "Enter Weight (in Kg)",
             value = weight,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
             onValueChanged = { weight = it })
         WeightHeightTextField(
             label = "Enter Height (in Meter)",
             value = height,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
             onValueChanged = { height = it },
         )
 
@@ -51,14 +62,19 @@ fun BMIScreen(modifier: Modifier = Modifier) {
 
 @SuppressLint("DefaultLocale")
 fun calculateBMI(weight: Double, height: Double): String {
-    return String.format("%.1f",(weight / (height * height)))
+    return String.format("%.1f", (weight / (height * height)))
 }
 
 @Composable
 fun WeightHeightTextField(
-    label: String, value: String, modifier: Modifier = Modifier, onValueChanged: (String) -> Unit
+    label: String,
+    keyboardOptions: KeyboardOptions,
+    value: String,
+    modifier: Modifier = Modifier,
+    onValueChanged: (String) -> Unit
 ) {
     TextField(
+        keyboardOptions = keyboardOptions,
         modifier = modifier.padding(8.dp),
         label = { Text(text = label) },
         value = value,
@@ -71,7 +87,7 @@ fun BMIResultView(
     result: String, modifier: Modifier = Modifier
 ) {
     Text(
-        text = "Your BMI Is \n$result",
+        text = "Your BMI Is : $result",
         textAlign = TextAlign.Center,
         fontSize = 24.sp,
         modifier = modifier
