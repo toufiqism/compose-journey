@@ -1,9 +1,12 @@
 package com.toufiq.dicegame
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -23,28 +26,13 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun DiceGame(modifier: Modifier = Modifier) {
 
-    var resultLeft by remember {
-        mutableStateOf(1)
-    }
-    var resultRight by remember {
-        mutableStateOf(1)
-    }
-
-    var diceSum by remember {
-        mutableStateOf(0)
-    }
-    var status by remember {
-        mutableStateOf("")
-    }
-    var target by remember {
-        mutableStateOf(0)
-    }
-    var btnText by remember {
-        mutableStateOf("Roll")
-    }
-    var isGameOver by remember {
-        mutableStateOf(false)
-    }
+    var resultLeft by remember { mutableStateOf(1) }
+    var resultRight by remember { mutableStateOf(1) }
+    var diceSum by remember { mutableStateOf(0) }
+    var status by remember { mutableStateOf("") }
+    var target by remember { mutableStateOf(0) }
+    var btnText by remember { mutableStateOf("Roll") }
+    var isGameOver by remember { mutableStateOf(false) }
 
     fun reset() {
         btnText = "Roll"
@@ -82,23 +70,14 @@ fun DiceGame(modifier: Modifier = Modifier) {
         }
     }
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Row {
-            Image(
-                painter = painterResource(id = getDiceImageResource(resultLeft)),
-                contentDescription = null,
-                modifier = Modifier.size(200.dp)
-            )
-
-            Image(
-                painter = painterResource(id = getDiceImageResource(resultRight)),
-                contentDescription = null,
-                modifier = Modifier.size(200.dp)
-            )
-        }
+        DiceRow(
+            imageResource1 = resultLeft,
+            imageResource2 = resultRight,
+            modifier = Modifier.fillMaxWidth()
+        )
         Spacer(modifier = Modifier.size(20.dp))
-        Text(text = "Result: $diceSum", fontSize = 18.sp)
+        DiceSumTextView("Result: $diceSum")
         Spacer(modifier = Modifier.size(20.dp))
-
         Text(text = status, fontSize = 18.sp)
         if (target > 0) {
             Text(text = "Your target is: $target", fontSize = 18.sp)
@@ -116,6 +95,32 @@ fun DiceGame(modifier: Modifier = Modifier) {
 
     }
 
+}
+
+@Composable
+private fun DiceSumTextView(text: String, modifier: Modifier = Modifier) {
+    Text(text = text, fontSize = 18.sp,modifier=modifier)
+}
+
+@Composable
+fun DiceImage(@DrawableRes imageResource: Int, modifier: Modifier = Modifier) {
+    Image(
+        painter = painterResource(id = getDiceImageResource(imageResource)),
+        contentDescription = null,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun DiceRow(
+    @DrawableRes imageResource1: Int,
+    @DrawableRes imageResource2: Int,
+    modifier: Modifier = Modifier
+) {
+    Row(horizontalArrangement = Arrangement.Center, modifier = modifier) {
+        DiceImage(imageResource = imageResource1, modifier = Modifier.size(200.dp))
+        DiceImage(imageResource = imageResource2, modifier = Modifier.size(200.dp))
+    }
 }
 
 fun getDiceImageResource(result: Int): Int {
