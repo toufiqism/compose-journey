@@ -2,7 +2,9 @@ package com.toufiq.bmiapp
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -28,6 +30,7 @@ fun BMIScreen(modifier: Modifier = Modifier) {
     var weight by remember { mutableStateOf("") }
     var height by remember { mutableStateOf("") }
     var bmi by remember { mutableStateOf("0.0") }
+    var bmiResult by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
@@ -49,14 +52,39 @@ fun BMIScreen(modifier: Modifier = Modifier) {
             ),
             onValueChanged = { height = it },
         )
+        Spacer(modifier = Modifier.size(15.dp))
+        Button(
+            onClick = {
+                bmi = calculateBMI(weight.toDoubleOrNull() ?: 0.0, height.toDoubleOrNull() ?: 0.0)
+                val doubleBmi = bmi.toDouble()
+                when {
+                    doubleBmi < 18.5 -> {
+                        bmiResult = "Underweight"
+                    }
 
-        Button(onClick = {
-            bmi = calculateBMI(weight.toDoubleOrNull() ?: 0.0, height.toDoubleOrNull() ?: 0.0)
-        }) {
+                    doubleBmi in 18.5..24.9 -> {
+                        bmiResult = "Normal weight"
+                    }
+
+                    doubleBmi in 25.0..29.9 -> {
+                        bmiResult = "Overweight"
+                    }
+
+                    doubleBmi >= 30.0 -> {
+                        bmiResult = "Obesity"
+                    }
+
+                    else -> {
+                        bmiResult = "Invalid BMI"
+                    }
+                }
+            }) {
             Text(text = "Calculate BMI")
         }
-
         BMIResultView(result = bmi)
+        Spacer(modifier = Modifier.size(15.dp))
+        if (bmiResult.trim().isNotBlank())
+            BMIStatusView(status = bmiResult)
     }
 }
 
@@ -88,6 +116,19 @@ fun BMIResultView(
 ) {
     Text(
         text = "Your BMI Is : $result",
+        textAlign = TextAlign.Center,
+        fontSize = 24.sp,
+        modifier = modifier
+    )
+
+}
+
+@Composable
+fun BMIStatusView(
+    status: String, modifier: Modifier = Modifier
+) {
+    Text(
+        text = "You are : $status",
         textAlign = TextAlign.Center,
         fontSize = 24.sp,
         modifier = modifier
