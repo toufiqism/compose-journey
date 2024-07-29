@@ -22,49 +22,48 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 @Composable
-fun BMIScreen(modifier: Modifier = Modifier) {
-
-    var weight by remember { mutableStateOf("") }
-    var height by remember { mutableStateOf("") }
-    var bmi by remember { mutableStateOf("0.0") }
-    var bmiResult by remember { mutableStateOf("") }
+fun BMIScreen(modifier: Modifier = Modifier, vm: BMIViewModel = viewModel()) {
 
     Column(
         modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         WeightHeightTextField(
             label = "Enter Weight (in Kg)",
-            value = weight,
+            value = vm.weight.value,
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
             ),
-            onValueChanged = { weight = it })
+            onValueChanged = { vm.weight.value = it })
         WeightHeightTextField(
             label = "Enter Height (in Meter)",
-            value = height,
+            value = vm.height.value,
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
             ),
-            onValueChanged = { height = it },
+            onValueChanged = { vm.height.value = it },
         )
         Spacer(modifier = Modifier.size(15.dp))
         CalculateBMIButton(
             onClick = {
-                bmi = calculateBMI(weight.toDoubleOrNull() ?: 0.0, height.toDoubleOrNull() ?: 0.0)
-                val doubleBmi = bmi.toDouble()
-                bmiResult = getBmiStatus(doubleBmi)
+                vm.bmi.value = vm.calculateBMI(
+                    vm.weight.value.toDoubleOrNull() ?: 0.0,
+                    vm.height.value.toDoubleOrNull() ?: 0.0
+                )
+                val doubleBmi = vm.bmi.value.toDouble()
+                vm.bmiResult.value = vm.getBmiStatus(doubleBmi)
             },
             label = "Calculate BMI",
         )
-        BMIResultView(result = bmi)
+        BMIResultView(result = vm.bmi.value)
         Spacer(modifier = Modifier.size(15.dp))
-        if (bmiResult.trim().isNotBlank())
-            BMIStatusView(status = bmiResult)
+        if (vm.bmiResult.value.trim().isNotBlank())
+            BMIStatusView(status = vm.bmiResult.value)
     }
 }
 
@@ -75,34 +74,6 @@ fun CalculateBMIButton(onClick: () -> Unit, label: String) {
     }
 }
 
-fun getBmiStatus(doubleBmi: Double): String {
-    return when {
-        doubleBmi < 18.5 -> {
-            "Underweight"
-        }
-
-        doubleBmi in 18.5..24.9 -> {
-            "Normal weight"
-        }
-
-        doubleBmi in 25.0..29.9 -> {
-            "Overweight"
-        }
-
-        doubleBmi >= 30.0 -> {
-            "Obesity"
-        }
-
-        else -> {
-            "Invalid BMI"
-        }
-    }
-}
-
-@SuppressLint("DefaultLocale")
-fun calculateBMI(weight: Double, height: Double): String {
-    return String.format("%.1f", (weight / (height * height)))
-}
 
 @Composable
 fun WeightHeightTextField(
