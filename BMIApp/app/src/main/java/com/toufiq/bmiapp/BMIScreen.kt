@@ -53,38 +53,49 @@ fun BMIScreen(modifier: Modifier = Modifier) {
             onValueChanged = { height = it },
         )
         Spacer(modifier = Modifier.size(15.dp))
-        Button(
+        CalculateBMIButton(
             onClick = {
                 bmi = calculateBMI(weight.toDoubleOrNull() ?: 0.0, height.toDoubleOrNull() ?: 0.0)
                 val doubleBmi = bmi.toDouble()
-                when {
-                    doubleBmi < 18.5 -> {
-                        bmiResult = "Underweight"
-                    }
-
-                    doubleBmi in 18.5..24.9 -> {
-                        bmiResult = "Normal weight"
-                    }
-
-                    doubleBmi in 25.0..29.9 -> {
-                        bmiResult = "Overweight"
-                    }
-
-                    doubleBmi >= 30.0 -> {
-                        bmiResult = "Obesity"
-                    }
-
-                    else -> {
-                        bmiResult = "Invalid BMI"
-                    }
-                }
-            }) {
-            Text(text = "Calculate BMI")
-        }
+                bmiResult = getBmiStatus(doubleBmi)
+            },
+            label = "Calculate BMI",
+        )
         BMIResultView(result = bmi)
         Spacer(modifier = Modifier.size(15.dp))
         if (bmiResult.trim().isNotBlank())
             BMIStatusView(status = bmiResult)
+    }
+}
+
+@Composable
+fun CalculateBMIButton(onClick: () -> Unit, label: String) {
+    Button(onClick = onClick) {
+        Text(text = label)
+    }
+}
+
+fun getBmiStatus(doubleBmi: Double): String {
+    return when {
+        doubleBmi < 18.5 -> {
+            "Underweight"
+        }
+
+        doubleBmi in 18.5..24.9 -> {
+            "Normal weight"
+        }
+
+        doubleBmi in 25.0..29.9 -> {
+            "Overweight"
+        }
+
+        doubleBmi >= 30.0 -> {
+            "Obesity"
+        }
+
+        else -> {
+            "Invalid BMI"
+        }
     }
 }
 
