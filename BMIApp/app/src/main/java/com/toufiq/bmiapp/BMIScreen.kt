@@ -10,6 +10,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,43 +28,38 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun BMIScreen(modifier: Modifier = Modifier, vm: BMIViewModel = viewModel()) {
-
+    val uiState by vm.bmiUIState.collectAsState()
     Column(
         modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         WeightHeightTextField(
             label = "Enter Weight (in Kg)",
-            value = vm.weight.value,
+            value = vm.weight,
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
             ),
-            onValueChanged = { vm.weight.value = it })
+            onValueChanged = { vm.updateWeight(it) })
         WeightHeightTextField(
             label = "Enter Height (in Meter)",
-            value = vm.height.value,
+            value = vm.height,
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
             ),
-            onValueChanged = { vm.height.value = it },
+            onValueChanged = { vm.updateHeight(it) },
         )
         Spacer(modifier = Modifier.size(15.dp))
         CalculateBMIButton(
             onClick = {
-                vm.bmi.value = vm.calculateBMI(
-                    vm.weight.value.toDoubleOrNull() ?: 0.0,
-                    vm.height.value.toDoubleOrNull() ?: 0.0
-                )
-                val doubleBmi = vm.bmi.value.toDouble()
-                vm.bmiResult.value = vm.getBmiStatus(doubleBmi)
+                vm.calculateBMI()
             },
             label = "Calculate BMI",
         )
-        BMIResultView(result = vm.bmi.value)
+        BMIResultView(result = uiState.bmi)
         Spacer(modifier = Modifier.size(15.dp))
-        if (vm.bmiResult.value.trim().isNotBlank())
-            BMIStatusView(status = vm.bmiResult.value)
+        if (uiState.bmiStatus.trim().isNotBlank())
+            BMIStatusView(status = uiState.bmiStatus)
     }
 }
 

@@ -6,18 +6,29 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class BMIViewModel : ViewModel() {
-    var weight = mutableStateOf("")
+    var weight by mutableStateOf("")
         private set
-    var height = mutableStateOf("")
-        private set
-    var bmi = mutableStateOf("0.0")
-        private set
-    var bmiResult = mutableStateOf("")
+    var height by mutableStateOf("")
         private set
 
-    fun getBmiStatus(doubleBmi: Double): String {
+    private val _bmiUIState = MutableStateFlow(BMIStateViewState())
+    val bmiUIState = _bmiUIState.asStateFlow()
+
+
+    fun updateWeight(it: String) {
+        weight = it
+    }
+
+    fun updateHeight(it: String) {
+        height = it
+    }
+
+    private fun getBmiStatus(doubleBmi: Double): String {
         return when {
             doubleBmi < 18.5 -> {
                 "Underweight"
@@ -32,7 +43,7 @@ class BMIViewModel : ViewModel() {
             }
 
             doubleBmi >= 30.0 -> {
-                "Obesity"
+                "Obese"
             }
 
             else -> {
@@ -41,9 +52,27 @@ class BMIViewModel : ViewModel() {
         }
     }
 
+    private fun isValid(): Boolean {
+        return weight.toDoubleOrNull() != null && height.toDoubleOrNull() != null
+    }
+
     @SuppressLint("DefaultLocale")
-    fun calculateBMI(weight: Double, height: Double): String {
-        return String.format("%.1f", (weight / (height * height)))
+    fun calculateBMI() {
+        if (isValid()) {
+            val bmi = (weight.toDouble()) / (height.toDouble()) * (height.toDouble())
+            val bmiString = String.format("%.1f", bmi)
+            val status = getBmiStatus(bmi)
+            _bmiUIState.update {
+                it.copy(bmi = bmiString, bmiStatus = status)
+            }
+        }
+
+
     }
 
 }
+
+data class BMIStateViewState(
+    val bmi: String = "0",
+    val bmiStatus: String = ""
+)
