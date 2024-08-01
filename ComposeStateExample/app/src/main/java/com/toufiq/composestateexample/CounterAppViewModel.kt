@@ -11,8 +11,7 @@ import kotlinx.coroutines.flow.update
 
 class CounterAppViewModel : ViewModel() {
 
-    var count by mutableStateOf(0)
-        private set
+    private var count by mutableStateOf(0)
 
     private val _counterUIState = MutableStateFlow(CounterUIState())
     val counterUIState = _counterUIState.asStateFlow()
