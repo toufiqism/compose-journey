@@ -16,8 +16,28 @@ fun NavigationExample(modifier: Modifier = Modifier) {
         navController = navController,
         startDestination = "screen_one"
     ) {
-        composable(route = "screen_one") { ScreenOne { navController.navigate("screen_two") } }
-        composable(route = "screen_two") { ScreenTwo { navController.navigate("screen_three") } }
-        composable(route = "screen_three") { ScreenThree { navController.popBackStack(route = "screen_one", inclusive = false) } }
+        composable(route = "screen_one") {
+            ScreenOne(
+                onNavigate = { navController.navigate("screen_two") },
+                onNavigateUp = { navController.navigateUp() })
+        }
+        composable(route = "screen_two") {
+            ScreenTwo(
+                onNavigate = { navController.navigate("screen_three") },
+                onNavigateUp = { navController.navigateUp() })
+        }
+        composable(route = "screen_three") {
+            ScreenThree(
+                onNavigate = {
+                    navController.popBackStack(
+                        route = "screen_one",
+                        inclusive = false
+                    )
+                },
+                onNavigateUp = {
+                    navController.navigateUp()
+                }
+            )
+        }
     }
 }
