@@ -12,6 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.toufiq.navigationexample.moviexample.Movie
+import com.toufiq.navigationexample.moviexample.MovieApp
 import com.toufiq.navigationexample.ui.theme.NavigationExampleTheme
 
 class MainActivity : ComponentActivity() {
@@ -40,6 +42,6 @@ private fun MyApp() {
 @Composable
 fun GreetingPreview() {
     NavigationExampleTheme {
-        MyApp()
+        MovieApp()
     }
 }
