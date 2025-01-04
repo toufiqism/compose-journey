@@ -153,7 +153,7 @@ fun AnimalCard(image: Int, selected: Boolean, onAnimalSelected: (animalName: Str
 @Preview(showBackground = true)
 @Composable
 fun AnimalCardPreview() {
-    AnimalCard(image = R.drawable.ic_dog, true, {})
+    AnimalCard(image = R.drawable.ic_dog, false, {})
 }
 
 

@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -52,32 +53,43 @@ fun HomeScreen(navController: NavHostController) {
             bottomNavController = bottomNavController,
             onEvent = movieListViewModel::onEvent
         )
-
-
     }, topBar = {
         TopAppBar(
             title = {
                 Text(
-                    text = if (movieListState.isCurrentPopularScreen) stringResource(R.string.popular) else stringResource(
-                        R.string.upcoming
-                    ), fontSize = 28.sp
+                    text =
+                    if (movieListState.isCurrentPopularScreen)
+                        stringResource(R.string.popular)
+                    else
+                        stringResource(R.string.upcoming), fontSize = 28.sp
                 )
             },
             modifier = Modifier.shadow(4.dp),
-            colors = TopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.inverseOnSurface)
+            colors = topAppBarColors(MaterialTheme.colorScheme.inverseOnSurface)
         )
     }, content = { innerPadding ->
-        Box(modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxSize()){
-            NavHost(navController = bottomNavController, startDestination = Routes.PopularMovieList.rout ){
-                composable(Routes.PopularMovieList.rout){
-                    PopularMovieScreen(movieListState = movieListState, navController = navController, onEvent = movieListViewModel::onEvent)
-                        
-
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            NavHost(
+                navController = bottomNavController,
+                startDestination = Routes.PopularMovieList.rout
+            ) {
+                composable(Routes.PopularMovieList.rout) {
+                    PopularMovieScreen(
+                        movieListState = movieListState,
+                        navController = navController,
+                        onEvent = movieListViewModel::onEvent
+                    )
                 }
-                composable(Routes.UpcomingMovieList.rout){
-                    UpcomingMovieScreen(movieListState = movieListState, navController = navController, onEvent = movieListViewModel::onEvent)
+                composable(Routes.UpcomingMovieList.rout) {
+                    UpcomingMovieScreen(
+                        movieListState = movieListState,
+                        navController = navController,
+                        onEvent = movieListViewModel::onEvent
+                    )
                 }
             }
         }
@@ -126,7 +138,8 @@ fun BottomNavigationBar(bottomNavController: NavController, onEvent: (MovieListU
                             text = bottomItem.title,
                             color = MaterialTheme.colorScheme.inverseOnSurface
                         )
-                    })
+                    }
+                )
             }
 
         }

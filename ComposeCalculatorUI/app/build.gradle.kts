@@ -1,17 +1,14 @@
 plugins {
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.jetbrainsKotlinAndroid)
-    id("com.google.dagger.hilt.android")
-    id("kotlin-kapt")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.jetbrains.kotlin.android)
 }
 
 android {
-
-    namespace = "com.toufiq.composemovieapp"
+    namespace = "com.modeone.composecalculatorui"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.toufiq.composemovieapp"
+        applicationId = "com.modeone.composecalculatorui"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
@@ -69,35 +66,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-
-
-    // Navigation
-    implementation(libs.androidx.navigation.compose)
-
-    // Room
-    implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.paging)
-
-    // Dagger - Hilt
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-    kapt(libs.androidx.hilt.compiler)
-    implementation(libs.androidx.hilt.navigation.compose)
-
-    // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.okhttp)
-    implementation(libs.logging.interceptor)
-
-    // Coil
-    implementation(libs.coil.compose)
-
-    // Extended Icons
-    implementation(libs.androidx.material.icons.extended)
-
-    // system UI Controller
-    implementation(libs.accompanist.systemuicontroller)
 }
