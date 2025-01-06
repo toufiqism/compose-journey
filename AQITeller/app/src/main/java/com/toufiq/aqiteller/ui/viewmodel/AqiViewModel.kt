@@ -6,10 +6,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
 
 class AqiViewModel(
     private val repository: AqiRepository,
-    private val locationHelper: LocationHelper
+    private val locationHelper: LocationHelper,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
     private val _aqiState = MutableStateFlow<AqiUiState>(AqiUiState.Initial)
     val aqiState: StateFlow<AqiUiState> = _aqiState
@@ -24,9 +26,11 @@ class AqiViewModel(
     private fun startPeriodicUpdates() {
         updateJob?.cancel()
         updateJob = viewModelScope.launch {
-            while (true) {
-                fetchCurrentLocationAndAqi()
-                delay(30 * 60 * 1000) // Update every 30 minutes
+            settingsRepository.settings.collect { settings ->
+                while (true) {
+                    fetchCurrentLocationAndAqi()
+                    delay(settings.notificationInterval * 60 * 1000L)
+                }
             }
         }
     }

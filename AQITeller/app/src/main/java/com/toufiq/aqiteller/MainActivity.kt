@@ -8,6 +8,10 @@ import AqiViewModel
 import LocationHelper
 import NetworkModule
 import NotificationHelper
+import PollutantDetails
+import SettingsRepository
+import SettingsScreen
+import SettingsViewModel
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -18,43 +22,82 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.toufiq.aqiteller.ui.theme.AQITellerTheme
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.animation.*
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.clickable
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.toufiq.aqiteller.ui.theme.AQITellerTheme
 import com.toufiq.aqiteller.ui.theme.aqi_good
 import com.toufiq.aqiteller.ui.theme.aqi_hazardous
 import com.toufiq.aqiteller.ui.theme.aqi_moderate
 import com.toufiq.aqiteller.ui.theme.aqi_unhealthy
 import com.toufiq.aqiteller.ui.theme.aqi_unhealthy_sensitive
 import com.toufiq.aqiteller.ui.theme.aqi_very_unhealthy
-import androidx.compose.material3.Divider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import com.toufiq.aqiteller.util.NavigationAnimations
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +116,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .windowInsetsPadding(WindowInsets.safeDrawing)
                     ) {
-                        AqiScreen(this@MainActivity)
+                        MainScreen()
                     }
                 }
             }
@@ -90,8 +133,64 @@ class MainActivity : ComponentActivity() {
                 description = "Air Quality Index Updates"
             }
             
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreen() {
+    val navController = rememberNavController()
+    val context = LocalContext.current
+
+    NavHost(
+        navController = navController,
+        startDestination = "home",
+        enterTransition = { NavigationAnimations.enterTransition() },
+        exitTransition = { NavigationAnimations.exitTransition() },
+        popEnterTransition = { NavigationAnimations.popEnterTransition() },
+        popExitTransition = { NavigationAnimations.popExitTransition() }
+    ) {
+        composable("home") {
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = "AQI Teller",
+                                modifier = Modifier.animateContentSize()
+                            )
+                        },
+                        actions = {
+                            IconButton(
+                                onClick = { navController.navigate("settings") },
+                                modifier = Modifier.scale((1f))
+                            ) {
+                                Icon(Icons.Default.Settings, "Settings")
+                            }
+                        }
+                    )
+                }
+            ) { paddingValues ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    AqiScreen(context)
+                }
+            }
+        }
+        composable("settings") {
+            val settingsViewModel = viewModel<SettingsViewModel>(
+                factory = SettingsViewModel.Factory
+            )
+            SettingsScreen(
+                viewModel = settingsViewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }
@@ -102,7 +201,8 @@ fun AqiScreen(
     viewModel: AqiViewModel = viewModel { 
         AqiViewModel(
             repository = AqiRepository(NetworkModule.aqiApiService),
-            locationHelper = LocationHelper(context)
+            locationHelper = LocationHelper(context),
+            settingsRepository = SettingsRepository(context)
         ) 
     }
 ) {
@@ -143,33 +243,29 @@ fun AqiScreen(
         }
     }
 
-    Scaffold { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            AnimatedContent(
-                targetState = aqiState,
-                transitionSpec = {
-                    AnimationUtils.enterTransition togetherWith AnimationUtils.exitTransition
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+    ) {
+        AnimatedContent(
+            targetState = aqiState,
+            transitionSpec = {
+                fadeIn() togetherWith fadeOut()
+            }
+        ) { state ->
+            when (state) {
+                is AqiUiState.Loading -> {
+                    LoadingIndicator()
                 }
-            ) { state ->
-                when (state) {
-                    is AqiUiState.Loading -> {
-                        LoadingIndicator()
-                    }
-                    is AqiUiState.Success -> {
-                        AqiContent(state.data)
-                    }
-                    is AqiUiState.Error -> {
-                        ErrorContent(state.message)
-                    }
-                    else -> {
-                        // Initial state
-                    }
+                is AqiUiState.Success -> {
+                    AqiContent(state.data)
+                }
+                is AqiUiState.Error -> {
+                    ErrorContent(state.message)
+                }
+                else -> {
+                    // Initial state
                 }
             }
         }
@@ -214,35 +310,43 @@ fun ErrorContent(message: String) {
 
 @Composable
 fun AqiContent(data: AqiResponse) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        contentPadding = PaddingValues(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        AqiCard(data.overall_aqi)
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        Text(
-            text = "Pollutant Details",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .padding(16.dp)
-        ) {
-            data.CO?.let { AqiDetailItem("CO", it) }
-            data.PM10?.let { AqiDetailItem("PM10", it) }
-            data.SO2?.let { AqiDetailItem("SO2", it) }
-            data.PM2_5?.let { AqiDetailItem("PM2.5", it) }
-            data.O3?.let { AqiDetailItem("O3", it) }
-            data.NO2?.let { AqiDetailItem("NO2", it) }
+        item {
+            AqiCard(data.overall_aqi)
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Text(
+                text = "Pollutant Details",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(16.dp)
+            ) {
+                data.CO?.let { AqiDetailItem("CO", it) }
+                data.PM10?.let { AqiDetailItem("PM10", it) }
+                data.SO2?.let { AqiDetailItem("SO2", it) }
+                data.PM2_5?.let { AqiDetailItem("PM2.5", it) }
+                data.O3?.let { AqiDetailItem("O3", it) }
+                data.NO2?.let { AqiDetailItem("NO2", it) }
+            }
         }
     }
 }
@@ -306,15 +410,27 @@ fun AqiDetailItem(name: String, data: AqiData) {
         "PM10" -> PollutantDetails.PM10
         else -> null
     }
+    
+    val elevation by animateDpAsState(
+        targetValue = if (expanded) 8.dp else 1.dp,
+        label = "Card Elevation"
+    )
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .clickable { expanded = !expanded },
+            .clickable { expanded = !expanded }
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
-        )
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = elevation)
     ) {
         Column(
             modifier = Modifier
