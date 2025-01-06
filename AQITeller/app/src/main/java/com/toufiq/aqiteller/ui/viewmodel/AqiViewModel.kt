@@ -1,12 +1,13 @@
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.toufiq.aqiteller.data.repository.SettingsRepository
+import com.toufiq.aqiteller.util.LocationHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.collect
 
 class AqiViewModel(
     private val repository: AqiRepository,

@@ -1,3 +1,5 @@
+package com.toufiq.aqiteller.ui.util
+
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 

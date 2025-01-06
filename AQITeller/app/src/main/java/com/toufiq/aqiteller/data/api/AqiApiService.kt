@@ -1,3 +1,6 @@
+package com.toufiq.aqiteller.data.api
+
+import AqiResponse
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query

@@ -1,3 +1,7 @@
+package com.toufiq.aqiteller.util
+
+import com.toufiq.aqiteller.worker.AqiWorker
+import com.toufiq.aqiteller.data.repository.SettingsRepository
 import android.content.Context
 import androidx.work.Constraints
 import androidx.work.NetworkType

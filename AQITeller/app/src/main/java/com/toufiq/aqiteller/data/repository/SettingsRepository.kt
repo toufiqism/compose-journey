@@ -1,3 +1,6 @@
+package com.toufiq.aqiteller.data.repository
+
+import Settings
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*

@@ -1,3 +1,7 @@
+package com.toufiq.aqiteller.ui.viewmodel
+
+import Settings
+import com.toufiq.aqiteller.data.repository.SettingsRepository
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider

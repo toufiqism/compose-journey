@@ -5,13 +5,13 @@ import AqiRepository
 import AqiResponse
 import AqiUiState
 import AqiViewModel
-import LocationHelper
-import NetworkModule
-import NotificationHelper
+import com.toufiq.aqiteller.util.LocationHelper
+import com.toufiq.aqiteller.di.NetworkModule
+import com.toufiq.aqiteller.util.NotificationHelper
 import PollutantDetails
-import SettingsRepository
+import com.toufiq.aqiteller.data.repository.SettingsRepository
 import SettingsScreen
-import SettingsViewModel
+import com.toufiq.aqiteller.ui.viewmodel.SettingsViewModel
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -29,7 +29,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn

@@ -1,3 +1,6 @@
+package com.toufiq.aqiteller.util
+
+import AqiResponse
 import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat

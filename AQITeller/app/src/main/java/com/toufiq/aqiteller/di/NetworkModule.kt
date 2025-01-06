@@ -1,3 +1,6 @@
+package com.toufiq.aqiteller.di
+
+import com.toufiq.aqiteller.data.api.AqiApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
