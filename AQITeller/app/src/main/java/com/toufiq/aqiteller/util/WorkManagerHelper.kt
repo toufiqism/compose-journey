@@ -1,19 +1,16 @@
 package com.toufiq.aqiteller.util
 
-import com.toufiq.aqiteller.worker.AqiWorker
-import com.toufiq.aqiteller.data.repository.SettingsRepository
 import android.content.Context
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import com.toufiq.aqiteller.worker.AqiWorker
+import com.toufiq.aqiteller.data.repository.SettingsRepository
 
 object WorkManagerHelper {
     private const val AQI_WORK_NAME = "aqi_periodic_work"
+    private const val MIN_BACKOFF_MILLIS = 60000L // 1 minute minimum backoff
 
     fun setupPeriodicAqiCheck(context: Context) {
         val constraints = Constraints.Builder()
@@ -25,11 +22,18 @@ object WorkManagerHelper {
             SettingsRepository(context).settings.first().notificationInterval
         }
 
+        // Ensure minimum interval is 15 minutes (WorkManager requirement)
+        val finalInterval = maxOf(intervalMinutes, 15)
+
         val workRequest = PeriodicWorkRequestBuilder<AqiWorker>(
-            intervalMinutes.toLong(), TimeUnit.MINUTES,
-            5, TimeUnit.MINUTES
+            finalInterval.toLong(), TimeUnit.MINUTES
         )
             .setConstraints(constraints)
+            .setBackoffCriteria(
+                BackoffPolicy.LINEAR,
+                MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
             .build()
 
         WorkManager.getInstance(context)
@@ -41,19 +45,22 @@ object WorkManagerHelper {
     }
 
     fun updatePeriodicAqiCheck(context: Context, intervalMinutes: Int) {
-        // Cancel existing work
-        WorkManager.getInstance(context).cancelUniqueWork(AQI_WORK_NAME)
+        // Ensure minimum interval is 15 minutes
+        val finalInterval = maxOf(intervalMinutes, 15)
         
-        // Setup new work with updated interval
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
         val workRequest = PeriodicWorkRequestBuilder<AqiWorker>(
-            intervalMinutes.toLong(), TimeUnit.MINUTES,
-            5, TimeUnit.MINUTES
+            finalInterval.toLong(), TimeUnit.MINUTES
         )
             .setConstraints(constraints)
+            .setBackoffCriteria(
+                BackoffPolicy.LINEAR,
+                MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
             .build()
 
         WorkManager.getInstance(context)

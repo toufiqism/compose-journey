@@ -1,13 +1,13 @@
 package com.toufiq.aqiteller.worker
 
 import AqiRepository
-import com.toufiq.aqiteller.util.LocationHelper
-import com.toufiq.aqiteller.di.NetworkModule
-import com.toufiq.aqiteller.util.NotificationHelper
-import com.toufiq.aqiteller.data.repository.SettingsRepository
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.toufiq.aqiteller.data.repository.SettingsRepository
+import com.toufiq.aqiteller.di.NetworkModule
+import com.toufiq.aqiteller.util.LocationHelper
+import com.toufiq.aqiteller.util.NotificationHelper
 import kotlinx.coroutines.flow.first
 
 class AqiWorker(
@@ -22,20 +22,21 @@ class AqiWorker(
     override suspend fun doWork(): Result {
         try {
             val settings = settingsRepository.settings.first()
+            
+            // Don't proceed if notifications are disabled
             if (!settings.notificationsEnabled) {
                 return Result.success()
             }
 
-            val location = locationHelper.getCurrentLocation()
-            if (location == null) {
-                return Result.retry()
-            }
+            val location = locationHelper.getCurrentLocation() ?: return Result.retry()
 
             repository.getAirQuality(location.latitude, location.longitude)
                 .onSuccess { response ->
-                    // Check if AQI is above threshold when high AQI notifications are enabled
+                    // Show notification if either:
+                    // 1. High AQI notifications are disabled (show all updates)
+                    // 2. High AQI notifications are enabled AND AQI is above threshold
                     if (!settings.notifyOnHighAqi || 
-                        (response.overall_aqi > settings.highAqiThreshold)
+                        (settings.notifyOnHighAqi && response.overall_aqi > settings.highAqiThreshold)
                     ) {
                         NotificationHelper.showAqiNotification(context, response)
                     }
