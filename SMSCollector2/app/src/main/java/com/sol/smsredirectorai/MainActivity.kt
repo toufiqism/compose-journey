@@ -31,6 +31,7 @@ import android.widget.Toast
 import android.provider.Telephony
 import android.content.ContentResolver
 import android.database.Cursor
+import androidx.compose.foundation.background
 import com.sol.smsredirectorai.data.SmsData
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
@@ -151,126 +152,210 @@ fun MainScreen(appPreferences: AppPreferences) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(statusBarPadding) // Add padding for status bar
-            .padding(16.dp), // Keep existing padding
+            .padding(statusBarPadding)
+            .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "SMS Redirector AI",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        // SIM 1 Button
-        Button(onClick = { showSim1Dialog = true }) {
-            Text(if (sim1Info.value.number.isEmpty()) "Configure SIM 1" 
-                else "SIM 1: ${sim1Info.value.name}")
-        }
-
-        // SIM 2 Button
-        Button(onClick = { showSim2Dialog = true }) {
-            Text(if (sim2Info.value.number.isEmpty()) "Configure SIM 2" 
-                else "SIM 2: ${sim2Info.value.name}")
-        }
-
-        // URL Input with Save and Edit Buttons
-        Row(
+        // Header
+        Surface(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            color = MaterialTheme.colorScheme.primaryContainer,
+            tonalElevation = 2.dp
         ) {
-            OutlinedTextField(
-                value = apiUrl,
-                onValueChange = { newUrl ->
-                    if (isUrlEditable) {
-                        apiUrl = newUrl
-                        urlError = validateUrl(newUrl)
-                    }
-                },
-                label = { Text("API URL") },
-                isError = urlError != null,
-                supportingText = urlError?.let { { Text(it) } },
-                modifier = Modifier.weight(1f),
-                enabled = isUrlEditable,
-                readOnly = !isUrlEditable
+            Text(
+                text = "SMS Redirector AI",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(24.dp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
-            
-            // Edit/Lock Button
-            IconButton(
-                onClick = { isUrlEditable = !isUrlEditable }
-            ) {
-                Icon(
-                    imageVector = if (isUrlEditable) 
-                        Icons.Default.Lock 
-                    else 
-                        Icons.Default.Edit,
-                    contentDescription = if (isUrlEditable) "Lock URL" else "Edit URL"
-                )
-            }
-            
-            // Save Button
-            Button(
-                onClick = {
-                    if (urlError == null) {
-                        scope.launch {
-                            appPreferences.saveApiUrl(apiUrl)
-                            Toast.makeText(context, "URL saved", Toast.LENGTH_SHORT).show()
-                            isUrlEditable = false // Lock after saving
-                        }
-                    }
-                },
-                enabled = isUrlEditable && urlError == null && apiUrl.isNotEmpty()
-            ) {
-                Text("Save")
-            }
         }
 
-        // Updated Send Last SMS button
-        Button(
-            onClick = {
-                if (apiUrl.isEmpty()) {
-                    Toast.makeText(context, "Please configure API URL first", Toast.LENGTH_SHORT).show()
-                    return@Button
+        // Content
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // SIM Cards Section
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        "SIM Configuration",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    
+                    // SIM 1 Button
+                    ElevatedButton(
+                        onClick = { showSim1Dialog = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        Text(if (sim1Info.value.number.isEmpty()) "Configure SIM 1" 
+                            else "SIM 1: ${sim1Info.value.name}")
+                    }
+
+                    // SIM 2 Button
+                    ElevatedButton(
+                        onClick = { showSim2Dialog = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        Text(if (sim2Info.value.number.isEmpty()) "Configure SIM 2" 
+                            else "SIM 2: ${sim2Info.value.name}")
+                    }
                 }
-                
-                scope.launch {
-                    try {
-                        // First try to get SMS from database
-                        var lastSms = database.smsDao().getLastSms()
+            }
+
+            // URL Configuration Section
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        "API Configuration",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedTextField(
+                            value = apiUrl,
+                            onValueChange = { newUrl ->
+                                if (isUrlEditable) {
+                                    apiUrl = newUrl
+                                    urlError = validateUrl(newUrl)
+                                }
+                            },
+                            label = { Text("API URL") },
+                            isError = urlError != null,
+                            supportingText = urlError?.let { { Text(it) } },
+                            modifier = Modifier.weight(1f),
+                            enabled = isUrlEditable,
+                            readOnly = !isUrlEditable,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+//                                textColor = MaterialTheme.colorScheme.onSurface,
+//                                placeholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                focusedLabelColor = MaterialTheme.colorScheme.primary
+                            )
+                        )
                         
-                        // If not found in database, try content provider
-                        if (lastSms == null) {
-                            lastSms = getLastSmsFromContentProvider(context.contentResolver)?.let { sms ->
-                                // Create SmsData from content provider SMS
-                                SmsData.create(
-                                    sender = sms.first,
-                                    receiver = sim1Info.value.number, // Use configured SIM as receiver
-                                    body = sms.second
+                        Column {
+                            IconButton(
+                                onClick = { isUrlEditable = !isUrlEditable }
+                            ) {
+                                Icon(
+                                    imageVector = if (isUrlEditable) 
+                                        Icons.Default.Lock 
+                                    else 
+                                        Icons.Default.Edit,
+                                    contentDescription = if (isUrlEditable) "Lock URL" else "Edit URL",
+                                    tint = MaterialTheme.colorScheme.onTertiaryContainer
                                 )
                             }
-                        }
-
-                        if (lastSms != null) {
-                            val response = apiService.sendSms(apiUrl, lastSms)
-                            if (response.isSuccessful) {
-                                // Only delete from database if it was from there
-                                if (lastSms.id != 0L) {
-                                    database.smsDao().delete(lastSms)
-                                }
-                                Toast.makeText(context, "SMS sent successfully", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Toast.makeText(context, "Failed to send SMS: ${response.code()}", Toast.LENGTH_SHORT).show()
+                            
+                            FilledTonalButton(
+                                onClick = {
+                                    if (urlError == null) {
+                                        scope.launch {
+                                            appPreferences.saveApiUrl(apiUrl)
+                                            Toast.makeText(context, "URL saved", Toast.LENGTH_SHORT).show()
+                                            isUrlEditable = false
+                                        }
+                                    }
+                                },
+                                enabled = isUrlEditable && urlError == null && apiUrl.isNotEmpty(),
+                                colors = ButtonDefaults.filledTonalButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            ) {
+                                Text("Save")
                             }
-                        } else {
-                            Toast.makeText(context, "No SMS found", Toast.LENGTH_SHORT).show()
                         }
-                    } catch (e: Exception) {
-                        Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-        ) {
-            Text("Send Last SMS")
+
+            // Action Section
+            FilledTonalButton(
+                onClick = {
+                    if (apiUrl.isEmpty()) {
+                        Toast.makeText(context, "Please configure API URL first", Toast.LENGTH_SHORT).show()
+                        return@FilledTonalButton
+                    }
+                    
+                    scope.launch {
+                        try {
+                            // First try to get SMS from database
+                            var lastSms = database.smsDao().getLastSms()
+                            
+                            // If not found in database, try content provider
+                            if (lastSms == null) {
+                                lastSms = getLastSmsFromContentProvider(context.contentResolver)?.let { sms ->
+                                    // Create SmsData from content provider SMS
+                                    SmsData.create(
+                                        sender = sms.first,
+                                        receiver = sim1Info.value.number, // Use configured SIM as receiver
+                                        body = sms.second
+                                    )
+                                }
+                            }
+
+                            if (lastSms != null) {
+                                val response = apiService.sendSms(apiUrl, lastSms)
+                                if (response.isSuccessful) {
+                                    // Only delete from database if it was from there
+                                    if (lastSms.id != 0L) {
+                                        database.smsDao().delete(lastSms)
+                                    }
+                                    Toast.makeText(context, "SMS sent successfully", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, "Failed to send SMS: ${response.code()}", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                Toast.makeText(context, "No SMS found", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            ) {
+                Text("Send Last SMS")
+            }
         }
     }
 
