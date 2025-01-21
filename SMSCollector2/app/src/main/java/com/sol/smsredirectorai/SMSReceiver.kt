@@ -6,11 +6,18 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Telephony
 import android.util.Log
+import androidx.compose.runtime.rememberCoroutineScope
+import com.sol.smsredirectorai.data.AppPreferences
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class SMSReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         var simSlot: String? = null
+        val scope = CoroutineScope(Dispatchers.IO)
+        val appPreferences = AppPreferences(context)
         try {
             val extras = intent?.extras
             if (extras != null) {
@@ -19,6 +26,9 @@ class SMSReceiver : BroadcastReceiver() {
                 simSlot = detectSim(extras) ?: "undetected"
 
                 Log.d("TEST", "onReceive: $simSlot")
+                scope.launch {
+                    appPreferences.saveSimSlot(simSlot)
+                }
             }
         } catch (ex: Exception) {
             Log.e("TEST", ex.stackTraceToString())

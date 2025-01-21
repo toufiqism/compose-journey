@@ -86,4 +86,7 @@ dependencies {
     implementation ("com.squareup.okhttp3:logging-interceptor:4.12.0")
     // Add desugaring support
     coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.0.4")
+
+
+    implementation ("androidx.work:work-runtime:2.10.0")
 }

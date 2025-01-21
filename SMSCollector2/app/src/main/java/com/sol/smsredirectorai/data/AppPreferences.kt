@@ -21,6 +21,8 @@ class AppPreferences(private val context: Context) {
         private val API_URL = stringPreferencesKey("api_url")
     }
 
+    private val simSlotKey = stringPreferencesKey("sim_slot")
+
     val sim1Info: Flow<SimInfo> = context.dataStore.data.map { preferences ->
         SimInfo(
             number = preferences[SIM1_NUMBER] ?: "",
@@ -39,6 +41,11 @@ class AppPreferences(private val context: Context) {
         preferences[API_URL] ?: ""
     }
 
+    val simSlot: Flow<String> = context.dataStore.data
+        .map { preferences ->
+            preferences[simSlotKey] ?: "undetected"
+        }
+
     suspend fun saveSim1Info(info: SimInfo) {
         context.dataStore.edit { preferences ->
             preferences[SIM1_NUMBER] = info.number
@@ -56,6 +63,12 @@ class AppPreferences(private val context: Context) {
     suspend fun saveApiUrl(url: String) {
         context.dataStore.edit { preferences ->
             preferences[API_URL] = url
+        }
+    }
+
+    suspend fun saveSimSlot(slot: String) {
+        context.dataStore.edit { preferences ->
+            preferences[simSlotKey] = slot
         }
     }
 }
