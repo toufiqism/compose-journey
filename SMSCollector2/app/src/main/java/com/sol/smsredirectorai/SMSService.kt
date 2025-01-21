@@ -69,7 +69,26 @@ class SMSService : Service() {
             ACTION_SEND_LAST_SMS -> {
                 scope.launch {
                     val lastSms = database.smsDao().getLastSms()
-                    lastSms?.let { sendSmsToApi(it) }
+                    if (lastSms != null) {
+                        // Get receiver based on stored slot
+                        val receiver = when (lastSms.simSlot) {
+                            "sim1" -> appPreferences.sim1Info.first().number
+                            "sim2" -> appPreferences.sim2Info.first().number
+                            else -> ""
+                        }
+
+                        // Update SMS with receiver if needed
+                        val updatedSms = if (lastSms.receiver.isEmpty() && receiver.isNotEmpty()) {
+                            lastSms.copy(receiver = receiver)
+                        } else lastSms
+
+                        if (receiver.isEmpty()) {
+                            Log.w("SMSService", "Cannot send SMS: receiver not configured for ${lastSms.simSlot}")
+                            return@launch
+                        }
+                        
+                        sendSmsToApi(updatedSms)
+                    }
                 }
             }
 
@@ -89,14 +108,29 @@ class SMSService : Service() {
     }
 
     private suspend fun handleNewSms(sender: String, message: String, simSlot: String) {
+        // Save the detected sim slot
+        appPreferences.saveSimSlot(simSlot)
+        
+        // Get receiver number based on sim slot
+        val receiver = when (simSlot.lowercase()) {
+            "sim1" -> appPreferences.sim1Info.first().number
+            "sim2" -> appPreferences.sim2Info.first().number
+            else -> ""
+        }
+
         val smsData = SmsData.create(
             sender = sender,
-            receiver = "", // Add receiver logic if needed
+            receiver = receiver,
             body = message,
             simSlot = simSlot
         )
 
         try {
+            if (receiver.isEmpty()) {
+                Log.w("SMSService", "Saving SMS to database as receiver number not configured for $simSlot")
+                database.smsDao().insert(smsData)
+                return
+            }
             sendSmsToApi(smsData)
         } catch (e: Exception) {
             Log.e("SMSService", "Failed to send SMS, saving to database", e)
