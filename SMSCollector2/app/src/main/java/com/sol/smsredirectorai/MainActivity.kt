@@ -45,6 +45,8 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import android.net.Uri
+import android.provider.Settings
 
 class MainActivity : ComponentActivity() {
     private lateinit var appPreferences: AppPreferences
@@ -57,6 +59,10 @@ class MainActivity : ComponentActivity() {
             // Start the service when permissions are granted
             startSmsService()
         }
+    }
+
+    companion object {
+        private const val OVERLAY_PERMISSION_REQ_CODE = 1234
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,6 +96,17 @@ class MainActivity : ComponentActivity() {
             permissions.add(Manifest.permission.POST_NOTIFICATIONS)
         }
 
+        // Check and request system alert window permission
+        if (!Settings.canDrawOverlays(this)) {
+            // If the app doesn't have permission, request it
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:$packageName")
+            )
+            startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE)
+        }
+
+        // Check and request other permissions
         if (permissions.all {
                 ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
             }) {
@@ -99,6 +116,23 @@ class MainActivity : ComponentActivity() {
         }
 
         requestPermissionLauncher.launch(permissions.toTypedArray())
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+            if (Settings.canDrawOverlays(this)) {
+                // Permission granted, start service
+                startSmsService()
+            } else {
+                // Permission denied
+                Toast.makeText(
+                    this,
+                    "System alert window permission is required",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
     private fun startSmsService() {

@@ -71,8 +71,12 @@ class SMSReceiver : BroadcastReceiver() {
                         Locale.getDefault()
                     ).contains("sim")
                 ) {
-                    val value = bundle.getString(key, "-1")
-                    if ((value == "0") or (value == "1") or (value == "2")) {
+//                    val value = bundle.getString(key, "-1")
+//                    if ((value == "0") or (value == "1") or (value == "2")) {
+//                        slot = bundle.getInt(key, -1)
+//                    }
+                    val value = bundle.getInt(key, -1)
+                    if ((value == 0) or (value == 1) or (value == 2)) {
                         slot = bundle.getInt(key, -1)
                     }
                 }
