@@ -3,12 +3,11 @@ package com.sol.appscheduler.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
 import com.sol.appscheduler.data.AppDatabase
-import com.sol.appscheduler.worker.StatusUpdateWorker
-import kotlinx.coroutines.runBlocking
+import com.sol.appscheduler.data.Schedule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * BroadcastReceiver for handling alarm triggers
@@ -20,25 +19,24 @@ class AlarmReceiver : BroadcastReceiver() {
         val scheduleId = intent.getIntExtra("schedule_id", -1)
 
         // Check schedule status before launching
-        val schedule = runBlocking {
-            AppDatabase.getInstance(context).scheduleDao().getById(scheduleId)
-        }
+        CoroutineScope(Dispatchers.IO).launch {
+            val dao = AppDatabase.getInstance(context.applicationContext).scheduleDao()
+            val schedule = dao.getById(scheduleId)
 
-        if (schedule == null || schedule.isCompleted) {
-            return  // Don't launch if already completed or invalid schedule
-        }
+            if (schedule == null || schedule.isCompleted) {
+                return@launch
+            }
 
-        // Launch target app
-        context.packageManager.getLaunchIntentForPackage(packageName)?.let {
-            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(it)
-        }
+            // Launch target app in main thread
+            CoroutineScope(Dispatchers.Main).launch {
+                context.packageManager.getLaunchIntentForPackage(packageName)?.let {
+                    it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(it)
+                }
+            }
 
-        // Update schedule status
-        val workRequest = OneTimeWorkRequestBuilder<StatusUpdateWorker>()
-            .setInputData(workDataOf("schedule_id" to scheduleId))
-            .build()
-        
-        WorkManager.getInstance(context).enqueue(workRequest)
+            // Update schedule status
+            dao.update(schedule.copy(isCompleted = true))
+        }
     }
 } 
