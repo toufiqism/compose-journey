@@ -7,10 +7,9 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface DeepseekApi {
-    @POST("chat/completions")
+    @POST("v1/chat/completions")
     suspend fun chat(
         @Header("Authorization") apiKey: String,
-        @Header("Content-Type") contentType: String = "application/json",
         @Body request: ChatRequest
     ): ChatResponse
 } 

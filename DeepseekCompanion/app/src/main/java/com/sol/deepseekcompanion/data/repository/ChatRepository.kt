@@ -1,8 +1,8 @@
 package com.sol.deepseekcompanion.data.repository
 
+import com.sol.deepseekcompanion.data.api.DeepseekApi
 import com.sol.deepseekcompanion.data.model.ChatRequest
 import com.sol.deepseekcompanion.data.model.ChatResponse
-import com.sol.deepseekcompanion.data.api.DeepseekApi
 import com.sol.deepseekcompanion.data.model.Message
 import javax.inject.Inject
 
@@ -13,6 +13,6 @@ class ChatRepository @Inject constructor(
 
     suspend fun sendMessage(messages: List<Message>): ChatResponse {
         val request = ChatRequest(messages = messages)
-        return api.chat(apiKey = "Bearer $apiKey", request = request)
+        return api.chat("Bearer $apiKey", request)
     }
 } 
