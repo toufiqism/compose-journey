@@ -60,7 +60,7 @@ fun MovieItem(
             Image(
                 painter = painterResource(id = movie.image),
                 contentDescription = movie.name,
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.cro,
                 modifier = modifier
                     .size(100.dp)
             )

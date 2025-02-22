@@ -12,7 +12,7 @@ fun MovieApp(modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = "home_page") {
         composable(route = "home_page") {
             HomePage(
-                listOf(),
+                DataSource().generateMovieList(),
                 onNavigate = {
                     navController.navigate("")
                 })
