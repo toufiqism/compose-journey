@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
 private fun MyApp() {
     NavigationExampleTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) {
-            MovieApp(modifier = Modifier)
+            NavigationExample()
         }
     }
 }

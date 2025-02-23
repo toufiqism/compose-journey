@@ -1,6 +1,7 @@
 package com.toufiq.navigationexample.moviexample
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,7 +34,7 @@ import com.toufiq.navigationexample.screens.components.MyAppBar
 @Composable
 fun HomePage(
     movies: List<Movie>,
-    onNavigate: () -> Unit, onNavigateUp: () -> Unit = {}
+    onNavigate: (Long) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -41,7 +42,9 @@ fun HomePage(
         }) {
         LazyColumn(modifier = Modifier.padding(it)) {
             items(movies) { movie ->
-                MovieItem(movie = movie, onMovieItemClick = { })
+                MovieItem(movie = movie, onMovieItemClick = {
+                    onNavigate(movie.id)
+                })
             }
         }
     }
@@ -53,7 +56,11 @@ fun MovieItem(
     onMovieItemClick: (Movie) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier = modifier.padding(8.dp)) {
+    Card(modifier = modifier
+        .padding(8.dp)
+        .clickable {
+            onMovieItemClick(movie)
+        }) {
         Row(
             modifier = modifier.fillMaxWidth()
         ) {
@@ -64,7 +71,13 @@ fun MovieItem(
                 modifier = modifier
                     .size(100.dp)
             )
-            Column() {
+            Column(
+                modifier = modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
                 Text(
                     text = movie.name,
                     style = MaterialTheme.typography.titleMedium
