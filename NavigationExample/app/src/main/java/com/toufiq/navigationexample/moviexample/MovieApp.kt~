@@ -24,7 +24,7 @@ fun MovieApp(modifier: Modifier = Modifier) {
                     navController.navigate("details_page/${it}")
                 },
                 onFavoriteClick = {
-                    vm.updateFavorites(it)
+                    vm.updateFavorite(it)
                 }
             )
         }

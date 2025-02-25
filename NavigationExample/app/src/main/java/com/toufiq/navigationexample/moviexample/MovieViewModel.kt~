@@ -26,10 +26,11 @@ class MovieViewModel : ViewModel() {
         _homeUiState.update { currentState ->
             val updatedList = currentState.movies.map { it ->
                 if (it.id == movie.id) {
-                    it.copy(favorite = !it.favorite)
+                    it.copy(favorite = !it.favorite))
                 } else {
                     it
                 }
+
             }
             HomeUiState(updatedList)
         }
