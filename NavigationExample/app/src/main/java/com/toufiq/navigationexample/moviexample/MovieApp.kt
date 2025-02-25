@@ -33,8 +33,7 @@ fun MovieApp(modifier: Modifier = Modifier) {
                 }
             )) {
             val id = it.arguments?.getLong("id")
-            val detailsUiState = vm.getMovieById(id!!).collectAsState().value.movie
-            DetailsPage(movie = detailsUiState) {
+            DetailsPage(id = id!!) {
                 navController.navigateUp()
             }
         }
